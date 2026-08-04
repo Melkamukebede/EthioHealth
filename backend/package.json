@@ -1,7 +1,7 @@
 {
   "name": "ethiohealth-api",
   "version": "1.0.0",
-  "description": "EthioHealth AI Pro - Backend API with Grok AI for Ethiopian Health",
+  "description": "EthioHealth  Pro - Backend API with Grok AI for Ethiopian Health",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -12,6 +12,6 @@
     "test": "echo \"Tests coming soon\" && exit 0"
   },
   "keywords": ["health", "ai", "ethiopia", "traditional-medicine"],
-  "author": "Your Name",
+  "author": "Melkamu Kebede Yote",
   "license": "ISC"
 }
