@@ -180,4 +180,157 @@ const Symptoms = (function() {
         const symptoms = App.getSelectedSymptoms();
         
         if (symptoms.length === 0) {
-            container.innerHTML = '<span class="text-m
+            container.innerHTML = '<span class="text-muted small">None selected - click symptoms above</span>';
+        } else {
+            container.innerHTML = symptoms.map(s => `
+                <span class="badge bg-success me-1 mb-1" style="cursor:pointer;" 
+                      onclick="App.toggleSymptom('${s}')">
+                    ${s.replace(/_/g, ' ')} <i class="fas fa-times ms-1"></i>
+                </span>
+            `).join(' ');
+        }
+    }
+    
+    /**
+     * Analyze selected symptoms
+     */
+    function analyzeSymptoms() {
+        const symptoms = App.getSelectedSymptoms();
+        
+        if (symptoms.length === 0) {
+            Utils.toast('Please select at least one symptom', 'warning');
+            return;
+        }
+        
+        const duration = Utils.getEl('symptomDuration')?.value || 'days';
+        const severity = parseInt(Utils.getEl('severitySlider')?.value || '5');
+        const notes = Utils.getEl('symptomNotes')?.value || '';
+        
+        Utils.showLoading('🔍 Grok AI analyzing symptoms...');
+        
+        setTimeout(() => {
+            const results = matchSymptomsToConditions(symptoms, severity, duration);
+            Utils.hideLoading();
+            
+            // Display results
+            const resultsDiv = Utils.getEl('symptomResults');
+            const contentDiv = Utils.getEl('symptomResultsContent');
+            
+            if (resultsDiv) resultsDiv.style.display = 'block';
+            if (contentDiv) {
+                contentDiv.innerHTML = results.length > 0 ? results.map(r => `
+                    <div class="risk-item ${r.urgency === 'urgent' ? 'high' : r.urgency === 'moderate' ? 'medium' : 'low'} mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong><i class="fas ${r.icon} me-2"></i>${r.name}</strong>
+                            <span class="fw-bold">${r.confidence}%</span>
+                        </div>
+                        <p class="small mb-0 mt-1">${r.message}</p>
+                        ${r.action ? `<p class="small text-success mb-0"><i class="fas fa-check-circle me-1"></i>${r.action}</p>` : ''}
+                        ${r.medicines ? `<p class="small text-primary mb-0 mt-1"><i class="fas fa-pills me-1"></i>${r.medicines.join(', ')}</p>` : ''}
+                    </div>
+                `).join('') : `<p class="text-center text-muted"><i class="fas fa-check-circle text-success fs-4 d-block mb-2"></i>No specific conditions identified. Monitor and consult doctor if symptoms persist.</p>`;
+            }
+            
+            // Scroll to results
+            Utils.scrollTo('symptomResults');
+            
+            // Save to DB
+            DB.saveSymptomCheck({ symptoms, duration, severity, notes, results });
+            
+            Utils.toast(`🔍 ${results.length} condition(s) identified`, results.length > 0 ? 'warning' : 'success');
+        }, 1500);
+    }
+    
+    /**
+     * Match symptoms to potential conditions
+     */
+    function matchSymptomsToConditions(symptoms, severity, duration) {
+        const findings = [];
+        const sympStr = symptoms.join(' ').toLowerCase();
+        
+        // Malaria check
+        if ((sympStr.includes('fever') || sympStr.includes('chills')) && 
+            (sympStr.includes('headache') || sympStr.includes('muscle_pain') || sympStr.includes('fatigue'))) {
+            findings.push({
+                name: 'Possible Malaria',
+                icon: 'fa-mosquito',
+                confidence: Math.min(90, 50 + (severity >= 7 ? 25 : 0) + (sympStr.includes('chills') ? 15 : 0)),
+                urgency: severity >= 7 ? 'urgent' : 'moderate',
+                message: 'Seek malaria RDT test at nearest health center immediately. Free testing available.',
+                action: 'Visit health center for free RDT test',
+                medicines: ['Artemether-Lumefantrine (Coartem)']
+            });
+        }
+        
+        // Respiratory/TB check
+        if ((sympStr.includes('cough') || sympStr.includes('chest_pain')) && 
+            (sympStr.includes('fever') || sympStr.includes('fatigue') || sympStr.includes('shortness_breath'))) {
+            const isTB = sympStr.includes('night_sweats') || sympStr.includes('weight_loss') || duration === 'weeks' || duration === 'months';
+            findings.push({
+                name: isTB ? 'Possible Tuberculosis (TB)' : 'Respiratory Infection',
+                icon: 'fa-lungs',
+                confidence: Math.min(85, 40 + (isTB ? 30 : 0) + (severity >= 6 ? 15 : 0)),
+                urgency: isTB ? 'urgent' : 'moderate',
+                message: isTB ? 'Free TB testing and treatment at government clinics (DOTS program).' : 'Rest and hydrate. Seek care if breathing difficulty worsens.',
+                action: isTB ? 'Visit health center for sputum test (free)' : 'Monitor and rest',
+                medicines: isTB ? ['Rifampicin', 'Isoniazid'] : ['Amoxicillin', 'Paracetamol']
+            });
+        }
+        
+        // Typhoid check
+        if (sympStr.includes('fever') && (sympStr.includes('abdominal_pain') || sympStr.includes('constipation') || sympStr.includes('diarrhea'))) {
+            findings.push({
+                name: 'Possible Typhoid Fever',
+                icon: 'fa-temperature-high',
+                confidence: Math.min(80, 40 + (severity >= 6 ? 20 : 0)),
+                urgency: 'moderate',
+                message: 'Requires antibiotic treatment. Drink only boiled water.',
+                action: 'Visit health center for Widal test',
+                medicines: ['Ciprofloxacin', 'Ceftriaxone']
+            });
+        }
+        
+        // Hypertension symptoms
+        if ((sympStr.includes('headache') || sympStr.includes('dizziness')) && 
+            (sympStr.includes('blurred_vision') || sympStr.includes('chest_pain') || sympStr.includes('rapid_heartbeat'))) {
+            findings.push({
+                name: 'Possible Hypertension',
+                icon: 'fa-tint',
+                confidence: Math.min(70, 30 + (severity >= 6 ? 20 : 0)),
+                urgency: 'moderate',
+                message: 'Check blood pressure at nearest health post. Reduce salt intake.',
+                action: 'Check BP at health center (free)',
+                medicines: ['Enalapril', 'Amlodipine']
+            });
+        }
+        
+        // Diabetes symptoms
+        if ((sympStr.includes('frequent_urination') || sympStr.includes('excessive_thirst') || sympStr.includes('blurred_vision')) && 
+            sympStr.includes('fatigue')) {
+            findings.push({
+                name: 'Possible Diabetes',
+                icon: 'fa-candy-cane',
+                confidence: Math.min(70, 35 + (severity >= 6 ? 15 : 0)),
+                urgency: 'moderate',
+                message: 'Get fasting glucose test. Reduce sugar and refined carbs.',
+                action: 'Fasting glucose test at health center',
+                medicines: ['Metformin']
+            });
+        }
+        
+        return findings;
+    }
+    
+    console.log('✅ Symptoms module loaded');
+    
+    return {
+        setupBodyMap,
+        showBodyPartSymptoms,
+        showCategorySymptoms,
+        loadPreset,
+        updateSelectedDisplay,
+        analyzeSymptoms,
+        symptomDB,
+        presets
+    };
+})();
