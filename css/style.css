@@ -1,1 +1,244 @@
 
+/* ============================================
+   ETHIOHEALTH AI PRO - AMAZON STYLE THEME
+   ============================================ */
+
+/* --- CSS Variables --- */
+:root {
+    --amazon-dark: #131921;
+    --amazon-nav: #232F3E;
+    --amazon-orange: #FF9900;
+    --amazon-yellow: #FFD814;
+    --amazon-red: #B12704;
+    --amazon-link: #007185;
+    --bg-light: #EAEDED;
+    --eth-green: #078930;
+    --eth-yellow: #FCDD09;
+    --eth-red: #DA121A;
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --purple: #8b5cf6;
+    --radius: 8px;
+    --shadow-card: 0 2px 5px rgba(0,0,0,0.1);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+    --transition: all 0.2s ease;
+}
+
+/* --- Base --- */
+* { box-sizing: border-box; }
+body { 
+    font-family: 'Amazon Ember', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Noto Sans Ethiopic', sans-serif;
+    background: var(--bg-light);
+    min-height: 100vh;
+    padding-bottom: 0;
+}
+
+/* --- Ethiopian Flag Stripe --- */
+.ethiopian-stripe {
+    display: flex;
+    height: 3px;
+}
+.stripe-green { flex:1; background: var(--eth-green); }
+.stripe-yellow { flex:1; background: var(--eth-yellow); }
+.stripe-red { flex:1; background: var(--eth-red); }
+
+/* --- Amazon Dark Navbar --- */
+.bg-amazon-dark { background: var(--amazon-dark) !important; }
+.bg-amazon-nav { background: var(--amazon-nav) !important; }
+.bg-gradient-success { background: linear-gradient(135deg, #059669, #10b981, #34d399) !important; }
+.bg-purple { background: var(--purple) !important; }
+.bg-amazon-orange { background: var(--amazon-orange) !important; border-color: var(--amazon-orange); color: #000; }
+.btn-amazon-orange { background: var(--amazon-orange); border-color: var(--amazon-orange); color: #000; font-weight: 600; }
+.btn-amazon-orange:hover { background: #e88b00; }
+
+/* --- Cards --- */
+.card {
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+.card-header {
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+}
+
+/* --- Hero Banner --- */
+.hero-banner {
+    background: linear-gradient(135deg, #059669, #10b981, #34d399);
+    border-radius: var(--radius);
+}
+
+/* --- Health Score Ring --- */
+.health-score-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 6px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-ring 2s infinite;
+}
+@keyframes pulse-ring {
+    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.3); }
+    50% { box-shadow: 0 0 0 15px transparent; }
+}
+
+/* --- Trending Cards --- */
+.trending-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.trending-card:hover {
+    background: #f0fdf4;
+    border-color: var(--primary);
+}
+
+/* --- Preset Buttons --- */
+.preset-btn {
+    transition: var(--transition);
+}
+.preset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* --- Body Map --- */
+.body-map-svg {
+    max-width: 200px;
+    margin: 0 auto;
+    display: block;
+}
+.body-map-wrapper {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* --- Symptom Tags --- */
+.symptom-tag {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 20px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+.symptom-tag:hover {
+    border-color: var(--primary);
+    background: #f0fdf4;
+}
+.symptom-tag.selected {
+    background: var(--primary);
+    color: white;
+    border-color: transparent;
+}
+
+/* --- Symptom List --- */
+.symptom-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+}
+.symptom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+/* --- Herb Cards --- */
+.herb-card-enhanced {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: var(--transition);
+    height: 100%;
+}
+.herb-card-enhanced:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* --- Voice Ring --- */
+.voice-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #d1fae5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+.voice-ring.active {
+    background: #fecaca;
+    animation: pulse-ring 1s infinite;
+}
+
+/* --- Risk Items --- */
+.risk-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: var(--radius);
+    border: 1px solid #e5e7eb;
+    background: white;
+}
+.risk-item.high { border-left: 4px solid #ef4444; background: #fef2f2; }
+.risk-item.medium { border-left: 4px solid #f59e0b; background: #fffbeb; }
+.risk-item.low { border-left: 4px solid #10b981; background: #f0fdf4; }
+.risk-bar {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.risk-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+}
+.risk-bar-fill.high { background: #ef4444; }
+.risk-bar-fill.medium { background: #f59e0b; }
+.risk-bar-fill.low { background: #10b981; }
+
+/* --- RTL Support --- */
+body.rtl { direction: rtl; }
+body.rtl .me-1, body.rtl .me-2 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 0 !important; }
+
+/* --- FAB Animation --- */
+#sosBtn {
+    animation: pulse-sos 2s infinite;
+}
+@keyframes pulse-sos {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { box-shadow: 0 0 0 15px transparent; }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .hero-banner { text-align: center; }
+    .body-map-svg { max-width: 150px; }
+}
