@@ -32,8 +32,10 @@ const diseaseKB = {
             modern: ['Enalapril', 'Amlodipine', 'Hydrochlorothiazide', 'Atenolol'],
             traditional: ['Moringa', 'Tosign', 'Gesho'],
             lifestyle: ['Reduce salt to <5g/day', '30 min daily walk', 'Monitor BP weekly at health center']
-        }
+        },
+        prevalence: '16-20% of Ethiopian adults'
     },
+    
     diabetes: {
         name: { en: 'Type 2 Diabetes', am: 'ዓይነት 2 የስኳር', om: 'Sukkaara Gosa 2' },
         icon: 'fa-candy-cane',
@@ -45,7 +47,6 @@ const diseaseKB = {
             else if (input.glucose >= 140) risk += 35;
             else if (input.glucose >= 126) risk += 20;
             else if (input.glucose >= 110) risk += 10;
-            else if (input.glucose >= 100) risk += 5;
             
             if (input.bmi >= 35) risk += 20;
             else if (input.bmi >= 30) risk += 15;
@@ -59,8 +60,10 @@ const diseaseKB = {
             modern: ['Metformin', 'Glibenclamide', 'Insulin NPH'],
             traditional: ['Moringa', 'Grawa', 'Koseret'],
             lifestyle: ['Exercise 30 min daily', 'Reduce sugar intake', 'Eat teff injera instead of white bread']
-        }
+        },
+        prevalence: '5-8% of adults, rising in urban areas'
     },
+    
     malaria: {
         name: { en: 'Malaria', am: 'ወባ', om: 'Busaa' },
         icon: 'fa-mosquito',
@@ -72,8 +75,9 @@ const diseaseKB = {
             else if (input.temperature >= 38) risk += 25;
             else if (input.temperature >= 37.5) risk += 10;
             
+            // Seasonal factor (June-September = peak)
             const month = new Date().getMonth() + 1;
-            if ([6,7,8,9].includes(month)) risk += 25;
+            if ([6, 7, 8, 9].includes(month)) risk += 25;
             
             return Math.min(100, risk);
         },
@@ -81,68 +85,77 @@ const diseaseKB = {
             modern: ['Artemether-Lumefantrine (Coartem)', 'Chloroquine', 'Quinine'],
             traditional: ['Neem', 'Gesho', 'Grawa'],
             lifestyle: ['Sleep under treated nets', 'Eliminate standing water', 'Seek free RDT test at health center']
-        }
+        },
+        prevalence: '60% of population at risk'
     },
+    
     tuberculosis: {
         name: { en: 'Tuberculosis (TB)', am: 'ሳንባ ነቀርሳ', om: 'Sombisaa' },
         icon: 'fa-lungs',
         color: '#8b5cf6',
         calculateRisk: (input) => {
             let risk = 0;
-            if (input.symptoms?.includes('persistent_cough')) risk += 40;
-            if (input.symptoms?.includes('night_sweats')) risk += 25;
-            if (input.symptoms?.includes('weight_loss')) risk += 20;
-            if (input.symptoms?.includes('fever')) risk += 10;
-            if (input.symptoms?.includes('chest_pain')) risk += 15;
+            const symptoms = input.symptoms || [];
+            if (symptoms.includes('persistent_cough')) risk += 40;
+            if (symptoms.includes('night_sweats')) risk += 25;
+            if (symptoms.includes('weight_loss')) risk += 20;
+            if (symptoms.includes('fever')) risk += 10;
+            if (symptoms.includes('chest_pain')) risk += 15;
+            if (symptoms.includes('coughing_blood')) risk += 30;
             return Math.min(100, risk);
         },
         treatment: {
             modern: ['Rifampicin', 'Isoniazid', 'Pyrazinamide', 'Ethambutol'],
             traditional: [],
-            lifestyle: ['Complete full DOTS treatment', 'Good nutrition', 'Respiratory hygiene', 'Free treatment at government clinics']
-        }
+            lifestyle: ['Complete full DOTS treatment (free)', 'Good nutrition', 'Respiratory hygiene']
+        },
+        prevalence: 'High burden: 150+ per 100,000'
     },
+    
     anemia: {
         name: { en: 'Anemia/Malnutrition', am: 'የደም ማነስ', om: 'Dhiiga Hanqina' },
         icon: 'fa-tint',
         color: '#ef4444',
         calculateRisk: (input) => {
             let risk = 0;
-            if (input.bmi < 18.5) risk += 50;
-            else if (input.bmi < 20) risk += 25;
-            if (input.symptoms?.includes('fatigue')) risk += 15;
-            if (input.symptoms?.includes('pale_skin')) risk += 20;
-            if (input.symptoms?.includes('dizziness')) risk += 15;
+            if (input.bmi < 16) risk += 50;
+            else if (input.bmi < 18.5) risk += 30;
+            else if (input.bmi < 20) risk += 15;
+            
+            const symptoms = input.symptoms || [];
+            if (symptoms.includes('fatigue')) risk += 15;
+            if (symptoms.includes('pale_skin')) risk += 20;
+            if (symptoms.includes('dizziness')) risk += 15;
+            if (symptoms.includes('shortness_breath')) risk += 10;
+            
             return Math.min(100, risk);
         },
         treatment: {
-            modern: ['Iron + Folic Acid', 'Vitamin B12'],
-            traditional: ['Moringa', 'Teff-based foods', 'Lentils'],
-            lifestyle: ['Eat iron-rich foods', 'Free supplements at antenatal clinics', 'Regular deworming']
-        }
+            modern: ['Iron + Folic Acid (free at clinics)', 'Vitamin B12'],
+            traditional: ['Moringa', 'Teff-based foods', 'Lentils and spinach'],
+            lifestyle: ['Eat iron-rich foods', 'Take supplements if prescribed', 'Regular deworming']
+        },
+        prevalence: '24% of women, 57% of children under 5'
     }
 };
 
 /**
- * Generate Grok-style reasoning
+ * Generate reasoning for the analysis
  */
 function generateReasoning(findings, input) {
-    const reasoning = [];
-    
     if (findings.length === 0) {
-        reasoning.push('Based on the provided health data, no significant disease risks were identified. All vital signs appear within normal ranges.');
-        return reasoning;
+        return ['All vital signs appear within normal ranges. No significant disease risks identified.'];
     }
     
-    reasoning.push(`Analysis of ${Object.keys(input).filter(k => k !== 'symptoms').length} vital signs reveals ${findings.length} potential health conditions.`);
+    const reasoning = [];
+    reasoning.push(`Analysis of ${Object.keys(input).length} health parameters reveals ${findings.length} potential health conditions.`);
     
     findings.slice(0, 3).forEach(f => {
-        reasoning.push(`${f.name.en}: ${f.risk}% probability based on ${f.factors?.length || 'multiple'} risk factors. ${f.risk >= 50 ? 'This requires medical attention.' : 'Monitor and follow preventive measures.'}`);
+        reasoning.push(
+            `${f.name.en}: ${f.risk}% risk (${f.level} level). ` +
+            `${f.risk >= 50 ? 'Medical consultation recommended.' : 'Preventive measures advised.'}`
+        );
     });
-    
-    if (input.symptoms?.length > 0) {
-        reasoning.push(`Additionally, ${input.symptoms.length} reported symptoms were factored into the analysis.`);
-    }
     
     return reasoning;
 }
@@ -153,7 +166,7 @@ function generateReasoning(findings, input) {
 function analyze(input) {
     const findings = [];
     let penaltyScore = 0;
-    
+
     // Analyze each disease
     for (const [diseaseId, disease] of Object.entries(diseaseKB)) {
         const risk = disease.calculateRisk(input);
@@ -161,7 +174,7 @@ function analyze(input) {
         if (risk >= 5) {
             const level = risk >= 60 ? 'high' : risk >= 30 ? 'medium' : risk >= 15 ? 'low' : 'minimal';
             const penalties = { high: 30, medium: 15, low: 5, minimal: 2 };
-            penaltyScore += penalties[level];
+            penaltyScore += penalties[level] || 0;
             
             findings.push({
                 id: diseaseId,
@@ -171,36 +184,47 @@ function analyze(input) {
                 risk,
                 level,
                 treatment: disease.treatment,
+                prevalence: disease.prevalence,
                 emergency: risk >= 60
             });
         }
     }
-    
-    // Sort by risk
+
+    // Sort by risk (highest first)
     findings.sort((a, b) => b.risk - a.risk);
-    
-    // Calculate score
+
+    // Calculate health score
     const score = Math.max(0, Math.min(100, 100 - penaltyScore));
-    
-    // Determine urgency
+
+    // Determine overall urgency
     const urgency = findings.some(f => f.emergency) ? 'urgent' :
                     findings.some(f => f.level === 'high') ? 'attention' : 'normal';
-    
+
     // Generate recommendations
     const recommendations = findings.map(f => ({
         condition: f.name.en,
+        risk: f.risk,
+        level: f.level,
         modern: f.treatment.modern.slice(0, 3),
         traditional: f.treatment.traditional.slice(0, 2),
         lifestyle: f.treatment.lifestyle[0]
     }));
-    
+
     return {
         score,
         findings,
         reasoning: generateReasoning(findings, input),
         urgency,
         recommendations,
-        timestamp: new Date().toISOString()
+        analyzedAt: new Date().toISOString(),
+        dataPoints: {
+            systolic: input.systolic,
+            diastolic: input.diastolic,
+            glucose: input.glucose,
+            bmi: input.bmi,
+            temperature: input.temperature,
+            age: input.age
+        }
     };
 }
 
