@@ -17,7 +17,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://ethiohealth.pages.dev
+        value: https://melkamukebede.github.io/EthioHealth/
 
 databases:
   - name: ethiohealth-db
