@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model HealthAnalysis {
+  id          Int      @id @default(autoincrement())
+  systolic    Float
+  diastolic   Float
+  glucose     Float
+  bmi         Float
+  temperature Float
+  age         Int
+  score       Int
+  findings    Json
+  urgency     String
+  symptoms    String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HerbQuery {
+  id        Int      @id @default(autoincrement())
+  query     String
+  results   Json
+  language  String   @default("en")
+  createdAt DateTime @default(now())
+}
+
+model VoiceCommand {
+  id        Int      @id @default(autoincrement())
+  transcript String
+  response  String
+  language  String   @default("en")
+  createdAt DateTime @default(now())
+}
