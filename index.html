@@ -558,7 +558,16 @@
     <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/i18next@23.11.5/i18next.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="js/app.js"></script>
+<!-- App Modules (ORDER MATTERS) -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/symptoms.js"></script>
+<script src="js/herbs.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => { if (typeof App !== 'undefined') App.init(); });
     </script>
