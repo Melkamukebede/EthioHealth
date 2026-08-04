@@ -66,58 +66,35 @@ const Analysis = (function() {
     /**
      * Run full health analysis
      */
-    function runAnalysis() {
-        const input = {
-            systolic: Utils.getVal('inputSystolic', 120),
-            diastolic: Utils.getVal('inputDiastolic', 80),
-            glucose: Utils.getVal('inputGlucose', 95),
-            bmi: Utils.getVal('inputBMI', 24),
-            temperature: Utils.getVal('inputTemp', 36.6),
-            age: Utils.getVal('inputAge', 30)
-        };
+    async function runAnalysis() {
+    const input = {
+        systolic: Utils.getVal('inputSystolic', 120),
+        diastolic: Utils.getVal('inputDiastolic', 80),
+        glucose: Utils.getVal('inputGlucose', 95),
+        bmi: Utils.getVal('inputBMI', 24),
+        temperature: Utils.getVal('inputTemp', 36.6),
+        age: Utils.getVal('inputAge', 30)
+    };
+    
+    Utils.showLoading('Grok AI analyzing via server...');
+    
+    try {
+        const result = await API.analyzeHealth(input);
         
-        // Validate
-        if (input.systolic < 60 || input.systolic > 250) {
-            Utils.toast('Invalid systolic BP (60-250)', 'warning');
-            return;
+        if (result.success) {
+            App.updateHealthScore(result.data.score);
+            App.renderRiskResults(result.data);
         }
-        
-        Utils.showLoading('🤖 Grok AI analyzing health data...');
-        
-        // Simulate AI processing
-        setTimeout(() => {
-            const results = analyzeData(input);
-            Utils.hideLoading();
-            
-            // Update UI
-            App.updateHealthScore(results.score);
-            App.renderRiskResults(results);
-            App.updateChart(results);
-            
-            // Save to database
-            DB.saveAnalysis({ ...input, score: results.score, findings: results.findings });
-            DB.saveTrend('score', results.score);
-            
-            // Toast notification
-            const emoji = results.score >= 70 ? '✅' : results.score >= 40 ? '⚠️' : '🚨';
-            Utils.toast(`${emoji} Health Score: ${results.score}/100`, 
-                results.score >= 70 ? 'success' : results.score >= 40 ? 'warning' : 'error');
-            
-            // Alert for high risks
-            const highRisks = results.findings.filter(f => f.level === 'high');
-            if (highRisks.length > 0) {
-                setTimeout(() => {
-                    Utils.toast(`⚠️ ${highRisks.length} high-risk condition(s) detected!`, 'warning', 5000);
-                }, 2000);
-            }
-            
-            Utils.log('Analysis complete:', results);
-        }, 2000);
+    } catch (error) {
+        // Fallback to local analysis
+        console.warn('API unavailable, using local analysis');
+        const results = Analysis.analyzeData(input);
+        App.updateHealthScore(results.score);
+        App.renderRiskResults(results);
     }
     
-    /**
-     * Core analysis logic
-     */
+    Utils.hideLoading();
+}
     function analyzeData(input) {
         const findings = [];
         let penaltyScore = 0;
