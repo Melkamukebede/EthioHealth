@@ -1,17 +1,19 @@
 {
   "name": "ethiohealth-api",
   "version": "1.0.0",
-  "description": "EthioHealth  Pro - Backend API with Grok AI for Ethiopian Health",
+  "description": "EthioHealth AI Pro - Backend API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "db:migrate": "npx prisma migrate dev --name init",
-    "db:push": "npx prisma db push",
-    "db:studio": "npx prisma studio",
-    "test": "echo \"Tests coming soon\" && exit 0"
+    "dev": "nodemon src/server.js"
   },
-  "keywords": ["health", "ai", "ethiopia", "traditional-medicine"],
-  "author": "Melkamu Kebede Yote",
-  "license": "ISC"
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "dotenv": "^16.3.1",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.1.4"
+  }
 }
