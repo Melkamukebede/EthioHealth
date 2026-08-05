@@ -4,7 +4,35 @@ const morgan = require('morgan');
 const compression = require('compression');
 
 const app = express();
+// Add these at the top with other requires
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'ethiohealth-secret-2024';
+const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+
+// Ensure data directory
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
+
+// Auth middleware
+function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ success: false, message: 'Access denied. No token.' });
+    }
+    try {
+        req.user = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+        next();
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+}
+
+///neww to check
 // Middleware
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
