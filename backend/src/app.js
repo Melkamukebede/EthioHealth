@@ -707,7 +707,83 @@ app.post('/api/v1/voice/process', (req, res) => {
         }
     });
 });
+// ============================================
+// AUTH ROUTES
+// ============================================
 
+// Register
+app.post('/api/v1/auth/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        if (!name || !email || !password) {
+            return res.status(400).json({ success: false, message: 'Name, email, and password required' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be 6+ characters' });
+        }
+        
+        const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        
+        if (users.find(u => u.email === email)) {
+            return res.status(400).json({ success: false, message: 'Email already registered' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = {
+            id: Date.now().toString(36),
+            name, email,
+            password: hashedPassword,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(user);
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+        
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        const { password: _, ...userData } = user;
+        
+        res.status(201).json({ success: true, data: { user: userData, token } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Login
+app.post('/api/v1/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password required' });
+        }
+        
+        const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        const user = users.find(u => u.email === email);
+        
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+        
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        const { password: _, ...userData } = user;
+        
+        res.json({ success: true, data: { user: userData, token } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Get Profile (Protected)
+app.get('/api/v1/auth/me', verifyToken, (req, res) => {
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.id === req.user.id);
+    
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    
+    const { password: _, ...userData } = user;
+    res.json({ success: true, data: { user: userData } });
+});
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({
