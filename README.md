@@ -99,13 +99,13 @@ Ethiopia faces unique healthcare challenges:
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | [https://melkamukebede.github.io/EthioHealth/](https://melkamukebede.github.io/EthioHealth/) |
+| **Frontend** | [https://melkamukebede.github.io/EthioHealth/](https://firstaid-98y.pages.dev/) |
 | **Backend API** | [https://ethiohalth-api.onrender.com/](https://ethiohalth-api.onrender.com/) |
 | **API Health Check** | [https://ethiohalth-api.onrender.com/api/health](https://ethiohalth-api.onrender.com/api/health) |
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 ### Login Page
 ![Login](screenshots/login.png)
@@ -127,7 +127,7 @@ Ethiopia faces unique healthcare challenges:
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 | Technology | Purpose |
