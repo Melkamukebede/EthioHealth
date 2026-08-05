@@ -3,829 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EthioHealth AI Pro - Ethiopian Health Companion</title>
-    
-    <!-- Bootstrap 5 -->
+    <title>EthioHealth AI Pro - Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
     <style>
         :root {
             --amazon-dark: #131921;
             --amazon-nav: #232F3E;
-            --amazon-orange: #FF9900;
             --amazon-yellow: #FFD814;
-            --amazon-red: #B12704;
-            --amazon-link: #007185;
-            --amazon-green: #007600;
-            --bg-light: #EAEDED;
+            --amazon-orange: #FF9900;
+            --primary: #10b981;
             --eth-green: #078930;
             --eth-yellow: #FCDD09;
             --eth-red: #DA121A;
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            --card-hover: 0 4px 12px rgba(0,0,0,0.15);
         }
-        
-        * { box-sizing: border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body { 
-            background: var(--bg-light); 
-            font-family: 'Amazon Ember', Arial, sans-serif;
-            margin: 0; 
-            padding: 0;
-            padding-bottom: 80px;
-        }
-        
-        /* Ethiopian Flag Stripe */
-        .flag-stripe {
-            display: flex; height: 4px;
-        }
-        .flag-stripe div:nth-child(1) { flex:1; background: var(--eth-green); }
-        .flag-stripe div:nth-child(2) { flex:1; background: var(--eth-yellow); }
-        .flag-stripe div:nth-child(3) { flex:1; background: var(--eth-red); }
-        
-        /* Amazon Dark Header */
-        .amazon-header {
-            background: var(--amazon-dark);
-            color: white;
-            padding: 10px 20px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #fefce8 100%);
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            justify-content: center;
         }
-        .amazon-header .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .amazon-header .logo i {
-            color: var(--primary);
-            font-size: 28px;
-        }
-        .amazon-header .search-bar {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-        }
-        .amazon-header .search-bar input {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 4px;
-            border: none;
-            font-size: 14px;
-        }
-        .amazon-header .nav-links {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            font-size: 13px;
-        }
-        .amazon-header .nav-links button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        .amazon-header .nav-links button:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        /* Category Nav */
-        .category-nav {
-            background: var(--amazon-nav);
-            padding: 8px 20px;
-            display: flex;
-            gap: 5px;
-            overflow-x: auto;
-            position: sticky;
-            top: 56px;
-            z-index: 999;
-        }
-        .category-nav button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 13px;
-        }
-        .category-nav button:hover, .category-nav button.active {
-            background: rgba(255,255,255,0.15);
-        }
-        
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px;
-        }
-        
-        /* Amazon Style Cards */
-        .amazon-card {
+        .flag-stripe { display:flex; height:4px; position:fixed; top:0; left:0; right:0; z-index:1000; }
+        .flag-stripe div:nth-child(1) { flex:1; background:var(--eth-green); }
+        .flag-stripe div:nth-child(2) { flex:1; background:var(--eth-yellow); }
+        .flag-stripe div:nth-child(3) { flex:1; background:var(--eth-red); }
+        .auth-container { max-width:420px; width:100%; padding:20px; }
+        .auth-card {
             background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 15px;
-            box-shadow: var(--card-shadow);
-            transition: box-shadow 0.2s;
-        }
-        .amazon-card:hover {
-            box-shadow: var(--card-hover);
-        }
-        .amazon-card .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0F1111;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        /* Hero Banner */
-        .hero-banner {
-            background: linear-gradient(135deg, #059669, #10b981, #34d399);
-            color: white;
+            border-radius: 12px;
             padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        .hero-banner h2 {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .hero-banner .btn-light {
-            background: white;
+        .auth-card .logo { text-align:center; margin-bottom:20px; }
+        .auth-card .logo i { font-size:50px; color:var(--primary); }
+        .auth-card h3 { font-weight:bold; color:#0F1111; }
+        .btn-auth {
+            background: var(--amazon-yellow);
             color: #0F1111;
             font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 20px;
             border: none;
-        }
-        
-        /* Health Score Ring */
-        .score-ring {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 6px solid var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            font-size: 32px;
-            font-weight: bold;
-            animation: pulse-ring 2s infinite;
-        }
-        @keyframes pulse-ring {
-            0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.3); }
-            50% { box-shadow: 0 0 0 20px transparent; }
-        }
-        
-        /* Vitals Grid */
-        .vitals-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .vitals-grid label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #565959;
-            margin-bottom: 2px;
-            display: block;
-        }
-        .vitals-grid input {
+            padding: 12px;
+            border-radius: 8px;
             width: 100%;
-            padding: 8px 12px;
-            border: 1.5px solid #ddd;
-            border-radius: 6px;
             font-size: 15px;
-            transition: border-color 0.2s;
-        }
-        .vitals-grid input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
-        }
-        
-        /* Amazon Button */
-        .btn-amazon {
-            background: var(--amazon-yellow);
-            color: #0F1111;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
-        .btn-amazon:hover {
-            background: #F7CA00;
-        }
-        .btn-amazon-orange {
-            background: var(--amazon-orange);
-            color: #0F1111;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-analyze {
-            background: var(--amazon-yellow);
-            color: #0F1111;
-            border: none;
+        .btn-auth:hover { background: #F7CA00; }
+        .btn-outline-auth {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
             width: 100%;
-            padding: 12px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.2s;
         }
-        .btn-analyze:hover {
-            background: #F7CA00;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        
-        /* Risk Items */
-        .risk-item {
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            border-left: 4px solid #ddd;
-            background: white;
-            transition: transform 0.2s;
-        }
-        .risk-item:hover { transform: translateX(3px); }
-        .risk-item.high { background: #fef2f2; border-left-color: #ef4444; }
-        .risk-item.medium { background: #fffbeb; border-left-color: #f59e0b; }
-        .risk-item.low { background: #f0fdf4; border-left-color: #10b981; }
-        .risk-bar { height: 6px; background: #e5e7eb; border-radius: 3px; margin-top: 6px; overflow: hidden; }
-        .risk-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
-        .risk-bar-fill.high { background: #ef4444; }
-        .risk-bar-fill.medium { background: #f59e0b; }
-        .risk-bar-fill.low { background: #10b981; }
-        
-        /* Herb Cards */
-        .herb-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .herb-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .herb-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--card-hover);
-            transform: translateY(-2px);
-        }
-        .herb-card h6 { color: #0F1111; margin-bottom: 4px; }
-        .herb-card .sci { color: #8b5cf6; font-size: 11px; font-style: italic; }
-        .herb-card .uses { color: #565959; font-size: 12px; }
-        
-        /* Badge */
-        .badge-amazon {
-            background: var(--amazon-red);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .badge-prime {
-            background: #007185;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-        }
-        
-        /* Loading Overlay */
+        .form-control { padding:12px; border-radius:8px; border:1.5px solid #ddd; }
+        .form-control:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(16,185,129,0.1); }
+        .toggle-link { color:var(--primary); cursor:pointer; text-decoration:none; font-weight:600; }
+        .toggle-link:hover { text-decoration:underline; }
+        .alert { border-radius:8px; font-size:14px; }
         #loadingOverlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.5); z-index:9999;
+            justify-content:center; align-items:center;
         }
-        .loading-box {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        
-        /* SOS Button */
-        .sos-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #ef4444;
-            color: white;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(239,68,68,0.4);
-            z-index: 1000;
-            animation: pulse-sos 2s infinite;
-        }
-        @keyframes pulse-sos {
-            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-            50% { box-shadow: 0 0 0 15px transparent; }
-        }
-        
-        /* Chart Container */
-        .chart-box {
-            height: 200px;
-            margin-top: 10px;
-        }
-        
-        /* Ethiopian Footer */
-        .footer {
-            background: var(--amazon-dark);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        
-        @media (min-width: 768px) {
-            .vitals-grid { grid-template-columns: 1fr 1fr 1fr; }
-            .herb-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
-        }
+        .loading-box { background:white; padding:20px 30px; border-radius:12px; text-align:center; }
     </style>
 </head>
 <body>
 
-    <!-- Ethiopian Flag Stripe -->
-    <div class="flag-stripe">
-        <div></div><div></div><div></div>
-    </div>
+    <!-- Ethiopian Flag -->
+    <div class="flag-stripe"><div></div><div></div><div></div></div>
 
-    <!-- Amazon-Style Header -->
-    <header class="amazon-header">
-        <div class="logo">
-            <i class="fas fa-heartbeat"></i>
-            <span>EthioHealth <small style="font-size:11px;color:#ccc;">AI Pro</small></span>
-        </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search symptoms, herbs, diseases...">
-        </div>
-        <div class="nav-links">
-            <button onclick="changeLanguage('en')">🇺🇸 EN</button>
-            <button onclick="changeLanguage('am')">🇪🇹 አማ</button>
-            <button onclick="changeLanguage('om')">🇪🇹 OM</button>
-            <button><i class="fas fa-bell"></i></button>
-            <button><i class="fas fa-user-circle"></i></button>
-        </div>
-    </header>
-
-    <!-- Category Navigation -->
-    <nav class="category-nav">
-        <button class="active" onclick="scrollToSection('home')"><i class="fas fa-home me-1"></i> Home</button>
-        <button onclick="scrollToSection('analysis')"><i class="fas fa-stethoscope me-1"></i> Health Check</button>
-        <button onclick="scrollToSection('herbs')"><i class="fas fa-leaf me-1"></i> Traditional Medicine</button>
-        <button onclick="scrollToSection('report')"><i class="fas fa-file-medical-alt me-1"></i> Report</button>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        
-        <!-- Hero Banner -->
-        <div class="hero-banner" id="home">
-            <div class="row align-items-center">
-                <div class="col-md-7">
-                    <span class="badge-amazon mb-2">🤖 Grok AI Powered</span>
-                    <h2>Your Ethiopian Health Companion</h2>
-                    <p class="mb-3">AI-powered health analysis, traditional medicine database, and emergency support - all in one place.</p>
-                    <button class="btn btn-light" onclick="scrollToSection('analysis')">
-                        <i class="fas fa-stethoscope me-2"></i>Check Your Health Now
-                    </button>
-                </div>
-                <div class="col-md-5 text-center d-none d-md-block">
-                    <i class="fas fa-heartbeat" style="font-size:100px;opacity:0.3;"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Health Score + Quick Check Row -->
-        <div class="row">
-            <!-- Health Score -->
-            <div class="col-md-4">
-                <div class="amazon-card text-center">
-                    <div class="score-ring">
-                        <span id="healthScore" style="color:#0F1111;">--</span>
-                    </div>
-                    <p class="fw-bold mt-2 mb-0">Health Score</p>
-                    <small class="text-muted">AI-Powered Assessment</small>
-                </div>
-            </div>
-            
-            <!-- Quick Health Check -->
-            <div class="col-md-8" id="analysis">
-                <div class="amazon-card">
-                    <div class="card-title">
-                        <i class="fas fa-heartbeat" style="color:var(--primary);"></i> 
-                        Quick Health Check
-                        <span class="badge-prime ms-2">Grok AI</span>
-                    </div>
-                    <div class="vitals-grid">
-                        <div>
-                            <label>Systolic BP (mmHg)</label>
-                            <input type="number" id="inputSystolic" value="135" placeholder="120">
-                        </div>
-                        <div>
-                            <label>Diastolic BP (mmHg)</label>
-                            <input type="number" id="inputDiastolic" value="88" placeholder="80">
-                        </div>
-                        <div>
-                            <label>Blood Sugar (mg/dL)</label>
-                            <input type="number" id="inputGlucose" value="130" placeholder="95">
-                        </div>
-                        <div>
-                            <label>BMI (kg/m²)</label>
-                            <input type="number" id="inputBMI" value="27" placeholder="24" step="0.1">
-                        </div>
-                        <div>
-                            <label>Temperature (°C)</label>
-                            <input type="number" id="inputTemp" value="37.2" placeholder="36.6" step="0.1">
-                        </div>
-                        <div>
-                            <label>Age (years)</label>
-                            <input type="number" id="inputAge" value="45" placeholder="30">
-                        </div>
-                    </div>
-                    <button class="btn-analyze" onclick="runAnalysis()">
-                        <i class="fas fa-microchip me-2"></i>Analyze with Grok AI
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Risk Results -->
-        <div class="amazon-card">
-            <div class="card-title">
-                <i class="fas fa-chart-pie" style="color:#f59e0b;"></i> 
-                AI Risk Assessment
-            </div>
-            <div id="riskResults">
-                <p class="text-center text-muted py-4">
-                    <i class="fas fa-clipboard-list" style="font-size:40px;display:block;margin-bottom:10px;"></i>
-                    Enter your vitals above and click Analyze
-                </p>
-            </div>
-            <div class="chart-box">
-                <canvas id="healthChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Ethiopian Traditional Herbs -->
-        <div class="amazon-card" id="herbs">
-            <div class="card-title">
-                <i class="fas fa-leaf" style="color:var(--primary);"></i> 
-                Ethiopian Traditional Medicine
-                <span class="badge-prime ms-2">8 Herbs</span>
-            </div>
-            <div class="herb-grid" id="herbList"></div>
-        </div>
-
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <p class="mb-1"><i class="fas fa-heartbeat" style="color:var(--primary);"></i> EthioHealth AI Pro</p>
-        <small>Bridging traditional Ethiopian medicine with modern AI technology</small><br>
-        <small style="color:#888;">© 2024 Made in Ethiopia 🇪🇹</small>
-    </div>
-
-    <!-- Loading Overlay -->
+    <!-- Loading -->
     <div id="loadingOverlay">
         <div class="loading-box">
-            <div class="spinner-border text-success mb-3" style="width:3rem;height:3rem;"></div>
-            <p class="fw-bold mb-0" id="loadingText">🤖 Grok AI is analyzing your health data...</p>
-            <small class="text-muted">Checking for Ethiopian-specific conditions</small>
+            <div class="spinner-border text-success mb-2"></div>
+            <p class="fw-bold mb-0">Please wait...</p>
         </div>
     </div>
 
-    <!-- SOS Button -->
-    <button class="sos-btn" onclick="if(confirm('Call Ethiopian Emergency (907)?'))window.location.href='tel:907'" title="Emergency SOS">
-        <i class="fas fa-ambulance"></i>
-    </button>
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo -->
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <h3 class="mt-2">EthioHealth AI Pro</h3>
+                <small class="text-muted">Grok AI Health Companion</small>
+            </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:10000;"></div>
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h5 class="mb-3"><i class="fas fa-sign-in-alt me-2"></i>Sign In</h5>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+                </div>
+                <div id="loginAlert" class="alert alert-danger" style="display:none;"></div>
+                <button class="btn-auth mb-3" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </button>
+                <p class="text-center mb-0">
+                    New to EthioHealth? 
+                    <span class="toggle-link" onclick="showRegister()">Create Account</span>
+                </p>
+                <p class="text-center mt-2">
+                    <span class="toggle-link" onclick="skipLogin()">Skip & Continue as Guest</span>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" style="display:none;">
+                <h5 class="mb-3"><i class="fas fa-user-plus me-2"></i>Create Account</h5>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="registerName" class="form-control" placeholder="Enter your name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="registerEmail" class="form-control" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="registerPassword" class="form-control" placeholder="Min 6 characters">
+                </div>
+                <div id="registerAlert" class="alert alert-danger" style="display:none;"></div>
+                <button class="btn-auth mb-3" onclick="handleRegister()">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+                <p class="text-center mb-0">
+                    Already have an account? 
+                    <span class="toggle-link" onclick="showLogin()">Sign In</span>
+                </p>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ============ CHART ============
-        let healthChart = null;
-        
-        // ============ ANALYSIS FUNCTION ============
-        function runAnalysis() {
-            console.log('🔬 Analysis started');
-            
-            // Get values
-            var systolic = parseFloat(document.getElementById('inputSystolic').value) || 120;
-            var diastolic = parseFloat(document.getElementById('inputDiastolic').value) || 80;
-            var glucose = parseFloat(document.getElementById('inputGlucose').value) || 95;
-            var bmi = parseFloat(document.getElementById('inputBMI').value) || 24;
-            var temperature = parseFloat(document.getElementById('inputTemp').value) || 36.6;
-            var age = parseFloat(document.getElementById('inputAge').value) || 30;
-            
-            // Show loading
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            
-            setTimeout(function() {
-                var findings = [];
-                var penalty = 0;
-                
-                // ===== HYPERTENSION =====
-                var hRisk = 0;
-                if (systolic >= 180) hRisk = 60;
-                else if (systolic >= 160) hRisk = 45;
-                else if (systolic >= 140) hRisk = 30;
-                else if (systolic >= 130) hRisk = 15;
-                else if (systolic >= 120) hRisk = 5;
-                if (diastolic >= 110) hRisk += 30;
-                else if (diastolic >= 90) hRisk += 20;
-                if (age >= 60) hRisk += 15;
-                else if (age >= 40) hRisk += 10;
-                if (bmi >= 30) hRisk += 15;
-                else if (bmi >= 25) hRisk += 8;
-                hRisk = Math.min(100, hRisk);
-                
-                if (hRisk >= 5) {
-                    var level = hRisk >= 50 ? 'high' : hRisk >= 25 ? 'medium' : 'low';
-                    penalty += level === 'high' ? 30 : level === 'medium' ? 15 : 5;
-                    findings.push({
-                        name: 'Hypertension (High BP)',
-                        icon: 'fa-tint',
-                        risk: hRisk,
-                        level: level,
-                        modern: 'Enalapril, Amlodipine',
-                        traditional: 'Moringa, Tosign, Gesho',
-                        advice: level === 'high' ? '⚠️ Seek medical attention' : 'Monitor BP weekly'
-                    });
-                }
-                
-                // ===== DIABETES =====
-                var dRisk = 0;
-                if (glucose >= 300) dRisk = 70;
-                else if (glucose >= 200) dRisk = 50;
-                else if (glucose >= 140) dRisk = 35;
-                else if (glucose >= 126) dRisk = 20;
-                else if (glucose >= 110) dRisk = 10;
-                if (bmi >= 35) dRisk += 20;
-                else if (bmi >= 30) dRisk += 15;
-                else if (bmi >= 25) dRisk += 8;
-                if (age >= 45) dRisk += 15;
-                dRisk = Math.min(100, dRisk);
-                
-                if (dRisk >= 5) {
-                    var level = dRisk >= 50 ? 'high' : dRisk >= 25 ? 'medium' : 'low';
-                    penalty += level === 'high' ? 30 : level === 'medium' ? 15 : 5;
-                    findings.push({
-                        name: 'Type 2 Diabetes',
-                        icon: 'fa-candy-cane',
-                        risk: dRisk,
-                        level: level,
-                        modern: 'Metformin, Glibenclamide',
-                        traditional: 'Moringa, Grawa, Koseret',
-                        advice: level === 'high' ? '🚨 Seek medical attention' : 'Exercise daily, reduce sugar'
-                    });
-                }
-                
-                // ===== MALARIA =====
-                var mRisk = 0;
-                if (temperature >= 40) mRisk = 60;
-                else if (temperature >= 39) mRisk = 40;
-                else if (temperature >= 38) mRisk = 25;
-                else if (temperature >= 37.5) mRisk = 10;
-                var month = new Date().getMonth() + 1;
-                if (month >= 6 && month <= 9) mRisk += 25;
-                mRisk = Math.min(100, mRisk);
-                
-                if (mRisk >= 10) {
-                    var level = mRisk >= 50 ? 'high' : mRisk >= 25 ? 'medium' : 'low';
-                    penalty += level === 'high' ? 25 : 10;
-                    findings.push({
-                        name: 'Malaria Risk',
-                        icon: 'fa-mosquito',
-                        risk: mRisk,
-                        level: level,
-                        modern: 'Artemether-Lumefantrine (Coartem)',
-                        traditional: 'Neem, Gesho, Grawa',
-                        advice: 'Use treated nets, seek free RDT test'
-                    });
-                }
-                
-                // ===== OBESITY =====
-                if (bmi >= 30) {
-                    penalty += 15;
-                    findings.push({
-                        name: 'Obesity',
-                        icon: 'fa-weight-scale',
-                        risk: Math.min(100, (bmi - 25) * 4),
-                        level: bmi >= 35 ? 'high' : 'medium',
-                        modern: 'Weight management program',
-                        traditional: 'Moringa tea, portion control',
-                        advice: 'Exercise 45 min daily'
-                    });
-                }
-                
-                // ===== ANEMIA =====
-                if (bmi < 18.5) {
-                    penalty += 15;
-                    findings.push({
-                        name: 'Anemia/Malnutrition Risk',
-                        icon: 'fa-tint',
-                        risk: Math.min(100, (20 - bmi) * 8),
-                        level: bmi < 16 ? 'high' : 'medium',
-                        modern: 'Iron + Folic Acid (free at clinics)',
-                        traditional: 'Moringa, Teff, Lentils',
-                        advice: 'Eat iron-rich foods, get supplements'
-                    });
-                }
-                
-                // Sort by risk
-                findings.sort(function(a, b) { return b.risk - a.risk; });
-                
-                var score = Math.max(0, Math.min(100, 100 - penalty));
-                
-                // ===== HIDE LOADING =====
-                document.getElementById('loadingOverlay').style.display = 'none';
-                
-                // ===== UPDATE HEALTH SCORE =====
-                var scoreEl = document.getElementById('healthScore');
-                scoreEl.textContent = score;
-                scoreEl.style.color = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
-                
-                // ===== SHOW RESULTS =====
-                var container = document.getElementById('riskResults');
-                if (findings.length === 0) {
-                    container.innerHTML = '<div class="text-center text-success py-3"><i class="fas fa-check-circle" style="font-size:40px;"></i><p class="mt-2 fw-bold">✅ No significant health risks detected!</p></div>';
+        const API_URL = 'https://ethiohalth-api.onrender.com/api/v1';
+
+        function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function skipLogin() {
+            localStorage.setItem('guest', 'true');
+            window.location.href = 'dashboard.html';
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const alert = document.getElementById('loginAlert');
+
+            if (!email || !password) {
+                alert.textContent = 'Please fill all fields';
+                alert.style.display = 'block';
+                return;
+            }
+
+            showLoading();
+            try {
+                const res = await fetch(API_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                hideLoading();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    localStorage.removeItem('guest');
+                    window.location.href = 'dashboard.html';
                 } else {
-                    var html = '';
-                    findings.forEach(function(f) {
-                        html += '<div class="risk-item ' + f.level + '">';
-                        html += '<div class="d-flex justify-content-between align-items-center">';
-                        html += '<strong><i class="fas ' + f.icon + ' me-2"></i>' + f.name + '</strong>';
-                        html += '<span class="fw-bold" style="font-size:16px;">' + f.risk + '%</span>';
-                        html += '</div>';
-                        html += '<div class="risk-bar"><div class="risk-bar-fill ' + f.level + '" style="width:' + f.risk + '%"></div></div>';
-                        html += '<div class="mt-2" style="font-size:12px;">';
-                        html += '<span class="badge bg-primary me-1">Modern</span> ' + f.modern;
-                        html += ' | <span class="badge bg-success me-1">Traditional</span> ' + f.traditional;
-                        html += '</div>';
-                        html += '<small class="text-muted mt-1 d-block">💡 ' + f.advice + '</small>';
-                        html += '</div>';
-                    });
-                    container.innerHTML = html;
+                    alert.textContent = data.message || 'Login failed';
+                    alert.style.display = 'block';
                 }
-                
-                // ===== UPDATE CHART =====
-                updateChart(findings);
-                
-                // ===== TOAST =====
-                showToast('✅ Health Score: ' + score + '/100', score >= 70 ? 'success' : 'warning');
-                
-                console.log('✅ Analysis complete. Score:', score);
-                
-            }, 1800);
+            } catch (err) {
+                hideLoading();
+                alert.textContent = 'Cannot connect to server';
+                alert.style.display = 'block';
+            }
         }
-        
-        // ============ CHART ============
-        function updateChart(findings) {
-            var canvas = document.getElementById('healthChart');
-            if (!canvas || findings.length === 0) return;
-            
-            var ctx = canvas.getContext('2d');
-            if (healthChart) healthChart.destroy();
-            
-            healthChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: findings.map(function(f) { return f.name.substring(0, 15); }),
-                    datasets: [{
-                        data: findings.map(function(f) { return f.risk; }),
-                        backgroundColor: findings.map(function(f) {
-                            return f.level === 'high' ? '#ef4444' : f.level === 'medium' ? '#f59e0b' : '#10b981';
-                        }),
-                        borderRadius: 8,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { callback: function(v) { return v + '%'; } } }
-                    }
-                }
-            });
-        }
-        
-        // ============ TOAST ============
-        function showToast(message, type) {
-            var bg = type === 'success' ? '#059669' : type === 'warning' ? '#d97706' : '#dc2626';
-            var toast = document.createElement('div');
-            toast.style.cssText = 'background:' + bg + ';color:white;padding:12px 20px;border-radius:25px;margin-bottom:8px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.2);animation:slideIn 0.3s ease;';
-            toast.textContent = message;
-            document.getElementById('toastContainer').appendChild(toast);
-            setTimeout(function() { toast.remove(); }, 3000);
-        }
-        
-        // ============ HERBS ============
-        function loadHerbs() {
-            var herbs = [
-                { name: 'Tena Adam', sci: 'Ruta chalepensis', icon: 'fa-leaf', uses: 'Stomach pain, headache, fever, cough', warn: 'Avoid with blood thinners' },
-                { name: 'Moringa', sci: 'Moringa stenopetala', icon: 'fa-seedling', uses: 'Malnutrition, BP, diabetes, anemia', warn: 'Monitor blood sugar' },
-                { name: 'Gesho', sci: 'Rhamnus prinoides', icon: 'fa-tree', uses: 'Digestion, malaria, intestinal worms', warn: 'May interact with diabetes meds' },
-                { name: 'Damakese', sci: 'Ocimum lamiifolium', icon: 'fa-leaf', uses: 'Fever, headache, cold, cough', warn: 'Generally safe' },
-                { name: 'Neem', sci: 'Azadirachta indica', icon: 'fa-tree', uses: 'Malaria, fever, skin diseases', warn: 'Not for pregnant women' },
-                { name: 'Tosign', sci: 'Thymus schimperi', icon: 'fa-leaf', uses: 'Cough, cold, BP, digestion', warn: 'May lower BP' },
-                { name: 'Koseret', sci: 'Lippia adoensis', icon: 'fa-leaf', uses: 'Digestion, parasites, fever', warn: 'Safe in cooking amounts' },
-                { name: 'Grawa', sci: 'Vernonia amygdalina', icon: 'fa-leaf', uses: 'Malaria, diabetes, parasites', warn: 'Very bitter. Monitor sugar' }
-            ];
-            
-            var html = '';
-            herbs.forEach(function(h) {
-                html += '<div class="herb-card" onclick="alert(\'' + h.name + '\\n\\n' + h.uses + '\\n\\n⚠️ ' + h.warn + '\')">';
-                html += '<i class="fas ' + h.icon + ' text-success" style="font-size:24px;"></i>';
-                html += '<h6 class="mt-1">' + h.name + '</h6>';
-                html += '<div class="sci">' + h.sci + '</div>';
-                html += '<div class="uses">' + h.uses + '</div>';
-                html += '<small class="text-danger">⚠️ ' + h.warn + '</small>';
-                html += '</div>';
-            });
-            
-            document.getElementById('herbList').innerHTML = html;
-        }
-        
-        // ============ LANGUAGE ============
-        function changeLanguage(lang) {
-            localStorage.setItem('lang', lang);
-            var msgs = { en: 'Language: English', am: 'ቋንቋ: አማርኛ', om: 'Afaan: Oromoo' };
-            showToast(msgs[lang] || 'Language changed', 'success');
-        }
-        
-        // ============ SCROLL ============
-        function scrollToSection(id) {
-            var el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // ============ INIT ============
-        loadHerbs();
-        console.log('✅ EthioHealth AI Pro - Amazon Style Ready');
-        // Test API connection on page load
-function testAPIConnection() {
-    fetch('https://ethiohalth-api.onrender.com/')
-        .then(r => r.json())
-        .then(d => {
-            console.log('✅ API Connected:', d.name);
-            showToast('✅ Connected to AI Server', 'success');
-        })
-        .catch(e => {
-            console.warn('⚠️ API offline, using local analysis');
-            showToast('📡 Offline mode - local analysis only', 'warning');
-        });
-}
 
-// Run on page load
-testAPIConnection();
+        async function handleRegister() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const alert = document.getElementById('registerAlert');
+
+            if (!name || !email || !password) {
+                alert.textContent = 'Please fill all fields';
+                alert.style.display = 'block';
+                return;
+            }
+            if (password.length < 6) {
+                alert.textContent = 'Password must be at least 6 characters';
+                alert.style.display = 'block';
+                return;
+            }
+
+            showLoading();
+            try {
+                const res = await fetch(API_URL + '/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+                hideLoading();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert.textContent = data.message || 'Registration failed';
+                    alert.style.display = 'block';
+                }
+            } catch (err) {
+                hideLoading();
+                alert.textContent = 'Cannot connect to server';
+                alert.style.display = 'block';
+            }
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('token') || localStorage.getItem('guest')) {
+            window.location.href = 'dashboard.html';
+        }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
