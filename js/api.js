@@ -6,7 +6,7 @@ const API = (function() {
     'use strict';
     
     // Change this to your Render.com URL after deployment
-    const BASE_URL = 'https://ethiohealth-api.onrender.com/api/v1';
+const BASE_URL = 'https://ethiohealth-api.onrender.com/api/v1';
 
     const TIMEOUT = 10000;
     
