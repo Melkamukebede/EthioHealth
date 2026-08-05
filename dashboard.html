@@ -204,13 +204,19 @@
                 </div>
             </div>
 
-            <!-- Results -->
-            <div class="amz-card">
-                <div class="card-title"><i class="fas fa-chart-pie" style="color:#f59e0b;"></i> AI Risk Assessment</div>
-                <div id="riskResults"><p class="text-center text-muted py-3">Enter vitals and click Analyze</p></div>
-                <canvas id="healthChart" height="180"></canvas>
-            </div>
-        </div>
+         <!-- Results -->
+<div class="amz-card">
+    <div class="card-title">
+        <i class="fas fa-chart-pie" style="color:#f59e0b;"></i> AI Risk Assessment
+    </div>
+    <div id="riskResults">
+        <p class="text-center text-muted py-3">Enter vitals and click Analyze</p>
+    </div>
+    <!-- FIXED CHART CONTAINER -->
+    <div class="chart-container" style="position:relative; height:250px; width:100%;">
+        <canvas id="healthChart"></canvas>
+    </div>
+</div>
 
         <!-- SYMPTOMS SECTION -->
         <div id="section-symptoms" style="display:none;">
