@@ -1,7 +1,7 @@
 {
   "name": "ethiohealth-api",
   "version": "1.0.0",
-  "description": "EthioHealth AI Pro - Backend API",
+  "description": "Ehiohealth - Backend API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
