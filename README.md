@@ -22,7 +22,6 @@
 - [Installation](#installation)
 - [Deployment](#deployment)
 - [Usage Guide](#usage-guide)
-- [Traditional Medicine Database](#traditional-medicine-database)
 - [Disease Detection](#disease-detection)
 - [Emergency Features](#emergency-features)
 - [Contributing](#contributing)
