@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EthioHealth AI Pro - Dashboard</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --amazon-dark: #131921;
+            --amazon-nav: #232F3E;
+            --amazon-yellow: #FFD814;
+            --amazon-orange: #FF9900;
+            --amazon-red: #B12704;
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --eth-green: #078930;
+            --eth-yellow: #FCDD09;
+            --eth-red: #DA121A;
+            --bg-light: #EAEDED;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-light); font-family: Arial, sans-serif; padding-bottom: 80px; }
+        
+        /* Ethiopian Flag */
+        .flag-stripe { display: flex; height: 3px; position: sticky; top: 0; z-index: 1001; }
+        .flag-stripe div:nth-child(1) { flex: 1; background: var(--eth-green); }
+        .flag-stripe div:nth-child(2) { flex: 1; background: var(--eth-yellow); }
+        .flag-stripe div:nth-child(3) { flex: 1; background: var(--eth-red); }
+        
+        /* Header */
+        .amz-header { background: var(--amazon-dark); color: white; padding: 8px 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 3px; z-index: 1000; }
+        .amz-header .logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .amz-header .logo i { color: var(--primary); font-size: 26px; }
+        .amz-header .search-bar { flex: 1; max-width: 400px; margin: 0 15px; }
+        .amz-header .search-bar input { width: 100%; padding: 8px 12px; border-radius: 4px; border: none; font-size: 14px; }
+        .amz-header .nav-icons { display: flex; gap: 12px; align-items: center; }
+        .amz-header .nav-icons button { background: none; border: none; color: white; cursor: pointer; font-size: 13px; padding: 5px 8px; border-radius: 4px; }
+        .amz-header .nav-icons button:hover { background: rgba(255,255,255,0.1); }
+        
+        /* Category Nav */
+        .cat-nav { background: var(--amazon-nav); padding: 6px 15px; display: flex; gap: 5px; overflow-x: auto; position: sticky; top: 56px; z-index: 999; }
+        .cat-nav button { background: none; border: none; color: white; padding: 6px 14px; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 13px; }
+        .cat-nav button:hover, .cat-nav button.active { background: rgba(255,255,255,0.15); }
+        
+        /* Main */
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 10px; }
+        
+        /* Cards */
+        .amz-card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: var(--card-shadow); }
+        .amz-card .card-title { font-weight: bold; font-size: 16px; color: #0F1111; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+        
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #059669, #10b981, #34d399); color: white; padding: 25px; border-radius: 8px; margin-bottom: 12px; }
+        
+        /* Vitals Grid */
+        .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .vitals-grid label { font-size: 11px; font-weight: 600; color: #565959; display: block; margin-bottom: 2px; }
+        .vitals-grid input { width: 100%; padding: 8px 10px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .vitals-grid input:focus { outline: none; border-color: var(--primary); }
+        
+        /* Buttons */
+        .btn-yellow { background: var(--amazon-yellow); color: #0F1111; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
+        .btn-yellow:hover { background: #F7CA00; }
+        .btn-green { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        
+        /* Risk Items */
+        .risk-item { padding: 10px 14px; margin-bottom: 6px; border-radius: 8px; border-left: 4px solid #ddd; }
+        .risk-item.high { background: #fef2f2; border-left-color: #ef4444; }
+        .risk-item.medium { background: #fffbeb; border-left-color: #f59e0b; }
+        .risk-item.low { background: #f0fdf4; border-left-color: #10b981; }
+        .risk-bar { height: 5px; background: #e5e7eb; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .risk-bar-fill { height: 100%; border-radius: 3px; }
+        .risk-bar-fill.high { background: #ef4444; }
+        .risk-bar-fill.medium { background: #f59e0b; }
+        .risk-bar-fill.low { background: #10b981; }
+        
+        /* Herb Cards */
+        .herb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .herb-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s; }
+        .herb-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: translateY(-1px); }
+        
+        /* Score Ring */
+        .score-ring { width: 80px; height: 80px; border-radius: 50%; border: 5px solid var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 26px; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.3); } 50% { box-shadow: 0 0 0 15px transparent; } }
+        
+        /* SOS Button */
+        .sos-btn { position: fixed; bottom: 20px; right: 15px; width: 56px; height: 56px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); z-index: 1000; animation: pulse-sos 2s infinite; }
+        @keyframes pulse-sos { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 15px transparent; } }
+        
+        /* Chat */
+        .chat-box { max-height: 300px; overflow-y: auto; padding: 10px; background: #f9fafb; border-radius: 8px; margin-bottom: 10px; }
+        .chat-msg { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; }
+        .chat-user { background: var(--primary); color: white; margin-left: auto; }
+        .chat-bot { background: #e5e7eb; color: #0F1111; }
+        
+        /* 3D Body Map */
+        .body-3d-container { perspective: 800px; width: 220px; height: 350px; margin: 0 auto; }
+        .body-3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: grab; }
+        .body-3d:active { cursor: grabbing; }
+        .body-part-3d { position: absolute; background: rgba(16,185,129,0.15); border: 2px solid rgba(16,185,129,0.3); border-radius: 50%; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .body-part-3d:hover { background: rgba(16,185,129,0.4); border-color: var(--primary); transform: scale(1.1); z-index: 10; }
+        .body-part-3d.selected { background: var(--primary); border-color: var(--primary-dark); color: white; }
+        
+        /* About Section */
+        .about-section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 12px; }
+        
+        /* Loading */
+        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .loading-box { background: white; padding: 25px 35px; border-radius: 12px; text-align: center; }
+        
+        /* Toast */
+        #toastContainer { position: fixed; top: 70px; right: 15px; z-index: 10000; }
+        .toast-msg { background: #333; color: white; padding: 10px 18px; border-radius: 20px; margin-bottom: 6px; font-size: 13px; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        @media (min-width: 768px) {
+            .vitals-grid { grid-template-columns: 1fr 1fr 1fr; }
+            .herb-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ethiopian Flag -->
+    <div class="flag-stripe"><div></div><div></div><div></div></div>
+
+    <!-- Header -->
+    <header class="amz-header">
+        <div class="logo" onclick="switchSection('home')">
+            <i class="fas fa-heartbeat"></i>
+            <span>EthioHealth <small style="font-size:10px;color:#aaa;">AI Pro</small></span>
+        </div>
+        <div class="search-bar d-none d-md-block">
+            <input type="text" placeholder="Search symptoms, herbs, health topics..." id="globalSearch">
+        </div>
+        <div class="nav-icons">
+            <button onclick="switchSection('home')"><i class="fas fa-home"></i></button>
+            <button onclick="switchSection('chat')"><i class="fas fa-comment-dots"></i></button>
+            <button onclick="switchSection('about')"><i class="fas fa-info-circle"></i></button>
+            <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> <span class="d-none d-md-inline">Exit</span></button>
+        </div>
+    </header>
+
+    <!-- Category Navigation -->
+    <nav class="cat-nav">
+        <button class="active" onclick="switchSection('home')"><i class="fas fa-home me-1"></i>Home</button>
+        <button onclick="switchSection('symptoms')"><i class="fas fa-stethoscope me-1"></i>Symptoms</button>
+        <button onclick="switchSection('herbs')"><i class="fas fa-leaf me-1"></i>Herbs</button>
+        <button onclick="switchSection('chat')"><i class="fas fa-robot me-1"></i>AI Chat</button>
+        <button onclick="switchSection('about')"><i class="fas fa-info-circle me-1"></i>About</button>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- HOME SECTION -->
+        <div id="section-home">
+            <!-- Hero -->
+            <div class="hero">
+                <span class="badge bg-light text-dark mb-2">🤖 Grok AI Powered</span>
+                <h3>Your Ethiopian Health Companion</h3>
+                <p class="mb-2">AI analysis · Traditional medicine · Emergency support</p>
+                <button class="btn btn-light btn-sm" onclick="switchSection('symptoms')">
+                    <i class="fas fa-stethoscope me-1"></i>Check Symptoms
+                </button>
+            </div>
+
+            <div class="row">
+                <!-- Health Score -->
+                <div class="col-md-4 mb-3">
+                    <div class="amz-card text-center">
+                        <div class="score-ring"><span id="healthScore">--</span></div>
+                        <p class="fw-bold mt-2 mb-0">Health Score</p>
+                        <small class="text-muted" id="lastUpdate">Click Analyze</small>
+                    </div>
+                </div>
+                
+                <!-- Quick Check -->
+                <div class="col-md-8 mb-3">
+                    <div class="amz-card">
+                        <div class="card-title"><i class="fas fa-heartbeat" style="color:var(--primary);"></i> Quick Health Check</div>
+                        <div class="vitals-grid">
+                            <div><label>Systolic BP</label><input type="number" id="sysInput" value="135" placeholder="120"></div>
+                            <div><label>Diastolic BP</label><input type="number" id="diaInput" value="88" placeholder="80"></div>
+                            <div><label>Blood Sugar</label><input type="number" id="gluInput" value="130" placeholder="95"></div>
+                            <div><label>BMI</label><input type="number" id="bmiInput" value="27" placeholder="24" step="0.1"></div>
+                            <div><label>Temperature °C</label><input type="number" id="tempInput" value="37.2" placeholder="36.6" step="0.1"></div>
+                            <div><label>Age</label><input type="number" id="ageInput" value="45" placeholder="30"></div>
+                        </div>
+                        <button class="btn-yellow mt-3" onclick="runAnalysis()">
+                            <i class="fas fa-microchip me-2"></i>Analyze with Grok AI
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="amz-card">
+                <div class="card-title"><i class="fas fa-chart-pie" style="color:#f59e0b;"></i> AI Risk Assessment</div>
+                <div id="riskResults"><p class="text-center text-muted py-3">Enter vitals and click Analyze</p></div>
+                <canvas id="healthChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- SYMPTOMS SECTION -->
+        <div id="section-symptoms" style="display:none;">
+            <div class="row">
+                <div class="col-md-5 mb-3">
+                    <div class="amz-card">
+                        <div class="card-title"><i class="fas fa-person"></i> Interactive Body Map</div>
+                        <p class="small text-muted mb-2">Click body parts to select symptoms</p>
+                        <div class="body-3d-container">
+                            <div class="body-3d" id="body3D">
+                                <div class="body-part-3d" data-part="head" style="width:70px;height:70px;top:5px;left:50%;transform:translateX(-50%);">Head</div>
+                                <div class="body-part-3d" data-part="chest" style="width:100px;height:80px;top:85px;left:50%;transform:translateX(-50%);">Chest</div>
+                                <div class="body-part-3d" data-part="abdomen" style="width:85px;height:70px;top:175px;left:50%;transform:translateX(-50%);">Abdomen</div>
+                                <div class="body-part-3d" data-part="left_arm" style="width:30px;height:80px;top:85px;left:5px;">L Arm</div>
+                                <div class="body-part-3d" data-part="right_arm" style="width:30px;height:80px;top:85px;right:5px;">R Arm</div>
+                                <div class="body-part-3d" data-part="left_leg" style="width:35px;height:90px;top:255px;left:30px;">L Leg</div>
+                                <div class="body-part-3d" data-part="right_leg" style="width:35px;height:90px;top:255px;right:30px;">R Leg</div>
+                            </div>
+                        </div>
+                        <div id="bodyPartSymptoms" class="mt-2"></div>
+                    </div>
+                </div>
+                <div class="col-md-7 mb-3">
+                    <div class="amz-card">
+                        <div class="card-title"><i class="fas fa-clipboard-list"></i> Symptom Details</div>
+                        <label class="form-label small fw-bold">Duration</label>
+                        <select id="symptomDuration" class="form-select mb-2">
+                            <option value="hours">Few hours</option>
+                            <option value="1day">1 day</option>
+                            <option value="2-3days">2-3 days</option>
+                            <option value="week">1 week</option>
+                            <option value="weeks">Several weeks</option>
+                        </select>
+                        <label class="form-label small fw-bold">Severity (1-10)</label>
+                        <input type="range" class="form-range" id="severitySlider" min="1" max="10" value="5">
+                        <span id="severityVal" class="badge bg-primary">5</span>
+                        <label class="form-label small fw-bold mt-2">Notes</label>
+                        <textarea id="symptomNotes" class="form-control mb-2" rows="2" placeholder="Additional details..."></textarea>
+                        
+                        <div class="alert alert-info small mb-2">
+                            <strong><i class="fas fa-check-circle me-1"></i>Selected Symptoms:</strong>
+                            <div id="selectedSymptomsList"><span class="text-muted">None</span></div>
+                        </div>
+                        <button class="btn-yellow" onclick="analyzeSymptoms()">
+                            <i class="fas fa-microchip me-2"></i>AI Diagnose Symptoms
+                        </button>
+                        <div id="symptomResults" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HERBS SECTION -->
+        <div id="section-herbs" style="display:none;">
+            <div class="amz-card">
+                <div class="card-title"><i class="fas fa-leaf" style="color:var(--primary);"></i> Ethiopian Traditional Medicine</div>
+                <p class="small text-muted">⚠️ Always consult healthcare provider before using herbs with modern medicines.</p>
+                
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="herbSearch" placeholder="Search herbs..." onkeyup="filterHerbs()">
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="herbCategory" onchange="filterHerbs()">
+                            <option value="all">All Categories</option>
+                            <option value="respiratory">Respiratory</option>
+                            <option value="digestive">Digestive</option>
+                            <option value="malaria">Anti-Malarial</option>
+                            <option value="chronic">Chronic Disease</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="herb-grid" id="herbList"></div>
+                <div id="herbDetail" class="mt-3" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- AI CHAT SECTION -->
+        <div id="section-chat" style="display:none;">
+            <div class="amz-card">
+                <div class="card-title"><i class="fas fa-robot" style="color:#8b5cf6;"></i> Grok AI Health Chat</div>
+                <div class="chat-box" id="chatBox">
+                    <div class="chat-msg chat-bot">
+                        <strong>🤖 Grok AI:</strong> Hello! I'm your Ethiopian health assistant. Ask me about symptoms, diseases, traditional medicine, diet, or emergencies.
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="chatInput" placeholder="Ask about your health..." onkeypress="if(event.key==='Enter')sendChat()">
+                    <button class="btn btn-success" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABOUT SECTION -->
+        <div id="section-about" style="display:none;">
+            <div class="about-section">
+                <h4><i class="fas fa-heartbeat" style="color:var(--primary);"></i> About EthioHealth AI Pro</h4>
+                <hr>
+                <p><strong>Version:</strong> 2.0.0</p>
+                <p><strong>Powered by:</strong> Grok AI Engine</p>
+                <p><strong>Languages:</strong> English · አማርኛ · Afaan Oromoo</p>
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li><i class="fas fa-check text-success"></i> AI Health Analysis (5 Ethiopian diseases)</li>
+                    <li><i class="fas fa-check text-success"></i> Interactive Body Map Symptom Checker</li>
+                    <li><i class="fas fa-check text-success"></i> Ethiopian Traditional Medicine Database (8 herbs)</li>
+                    <li><i class="fas fa-check text-success"></i> Herb-Drug Interaction Checker</li>
+                    <li><i class="fas fa-check text-success"></i> Grok AI Health Chat Assistant</li>
+                    <li><i class="fas fa-check text-success"></i> Emergency SOS (907)</li>
+                    <li><i class="fas fa-check text-success"></i> Offline Support</li>
+                </ul>
+                <p class="text-muted small">⚠️ This app provides AI-assisted health information. Always consult qualified healthcare providers for medical decisions.</p>
+                <p class="text-muted small">Made in Ethiopia 🇪🇹</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Button -->
+    <button class="sos-btn" onclick="if(confirm('Call Ethiopian Emergency (907)?'))window.location.href='tel:907'" title="Emergency SOS">
+        <i class="fas fa-ambulance"></i>
+    </button>
+
+    <!-- Loading -->
+    <div id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner-border text-success mb-2" style="width:3rem;height:3rem;"></div>
+            <p class="fw-bold mb-0" id="loadingText">🤖 Grok AI analyzing...</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ============ CONFIGURATION ============
+        const API = 'https://ethiohalth-api.onrender.com/api/v1';
+        let selectedSymptoms = [];
+        let healthChart = null;
+        let allHerbs = [];
+        
+        // ============ INIT ============
+        function init() {
+            if (!localStorage.getItem('token') && !localStorage.getItem('guest')) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loadHerbs();
+            updateUserDisplay();
+            document.getElementById('severitySlider').addEventListener('input', function() {
+                document.getElementById('severityVal').textContent = this.value;
+            });
+            setupBodyMap();
+            console.log('✅ Dashboard ready');
+        }
+        
+        function updateUserDisplay() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.name) {
+                document.querySelector('.nav-icons').innerHTML += 
+                    `<span class="text-white small d-none d-md-inline">${user.name}</span>`;
+            }
+        }
+        
+        // ============ NAVIGATION ============
+        function switchSection(section) {
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+            const el = document.getElementById('section-' + section);
+            if (el) el.style.display = 'block';
+            
+            document.querySelectorAll('.cat-nav button').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.cat-nav button[onclick*="${section}"]`);
+            if (btn) btn.classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // ============ TOAST ============
+        function toast(msg, type) {
+            const bg = type === 'success' ? '#059669' : type === 'warning' ? '#d97706' : type === 'error' ? '#dc2626' : '#333';
+            const el = document.createElement('div');
+            el.className = 'toast-msg';
+            el.style.background = bg;
+            el.textContent = msg;
+            document.getElementById('toastContainer').appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+        
+        function showLoading(text) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            if (text) document.getElementById('loadingText').textContent = text;
+        }
+        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+        
+        // ============ AUTH ============
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('guest');
+            window.location.href = 'index.html';
+        }
+        
+        // ============ HEALTH ANALYSIS ============
+        async function runAnalysis() {
+            const data = {
+                systolic: parseFloat(document.getElementById('sysInput').value) || 120,
+                diastolic: parseFloat(document.getElementById('diaInput').value) || 80,
+                glucose: parseFloat(document.getElementById('gluInput').value) || 95,
+                bmi: parseFloat(document.getElementById('bmiInput').value) || 24,
+                temperature: parseFloat(document.getElementById('tempInput').value) || 36.6,
+                age: parseFloat(document.getElementById('ageInput').value) || 30
+            };
+            
+            showLoading('🤖 Connecting to Grok AI...');
+            
+            try {
+                const res = await fetch(API + '/health/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                hideLoading();
+                
+                if (result.success) {
+                    displayResults(result.data);
+                } else {
+                    localAnalysis(data);
+                }
+            } catch (err) {
+                hideLoading();
+                localAnalysis(data);
+            }
+        }
+        
+        function localAnalysis(data) {
+            const findings = [];
+            let penalty = 0;
+            
+            if (data.systolic >= 140) { penalty += 25; findings.push({ name: 'Hypertension Risk', icon: 'fa-tint', risk: Math.min(100,(data.systolic-120)*2), level: data.systolic>=160?'high':'medium' }); }
+            if (data.glucose >= 126) { penalty += 25; findings.push({ name: 'Diabetes Risk', icon: 'fa-candy-cane', risk: Math.min(100,(data.glucose-100)*1.5), level: data.glucose>=200?'high':'medium' }); }
+            if (data.temperature >= 38) { penalty += 20; findings.push({ name: 'Malaria Risk', icon: 'fa-mosquito', risk: Math.min(100,(data.temperature-36)*20), level: 'medium' }); }
+            if (data.bmi >= 30) { penalty += 15; findings.push({ name: 'Obesity', icon: 'fa-weight-scale', risk: Math.min(100,(data.bmi-25)*4), level: data.bmi>=35?'high':'medium' }); }
+            
+            const score = Math.max(0, Math.min(100, 100 - penalty));
+            displayResults({ score, findings });
+        }
+        
+        function displayResults(results) {
+            document.getElementById('healthScore').textContent = results.score;
+            document.getElementById('healthScore').style.color = results.score >= 70 ? '#10b981' : results.score >= 40 ? '#f59e0b' : '#ef4444';
+            document.getElementById('lastUpdate').textContent = 'Updated just now';
+            
+            const container = document.getElementById('riskResults');
+            if (!results.findings || results.findings.length === 0) {
+                container.innerHTML = '<p class="text-center text-success py-3"><i class="fas fa-check-circle"></i> No significant risks</p>';
+            } else {
+                container.innerHTML = results.findings.map(f => `
+                    <div class="risk-item ${f.level}">
+                        <div class="d-flex justify-content-between">
+                            <strong><i class="fas ${f.icon} me-2"></i>${f.name}</strong>
+                            <span class="fw-bold">${f.risk}%</span>
+                        </div>
+                        <div class="risk-bar"><div class="risk-bar-fill ${f.level}" style="width:${f.risk}%"></div></div>
+                    </div>
+                `).join('');
+            }
+            
+            updateChart(results.findings || []);
+            toast('✅ Score: ' + results.score + '/100', results.score >= 70 ? 'success' : 'warning');
+        }
+        
+        function updateChart(findings) {
+            const canvas = document.getElementById('healthChart');
+            if (!canvas || findings.length === 0) return;
+            if (healthChart) healthChart.destroy();
+            
+            healthChart = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: findings.map(f => f.name.substring(0,12)),
+                    datasets: [{
+                        data: findings.map(f => f.risk),
+                        backgroundColor: findings.map(f => f.level==='high'?'#ef4444':f.level==='medium'?'#f59e0b':'#10b981'),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+        
+        // ============ BODY MAP ============
+        function setupBodyMap() {
+            document.querySelectorAll('.body-part-3d').forEach(part => {
+                part.addEventListener('click', function() {
+                    document.querySelectorAll('.body-part-3d').forEach(p => p.classList.remove('selected'));
+                    this.classList.add('selected');
+                    showBodyPartSymptoms(this.dataset.part);
+                });
+            });
+            
+            // 3D rotation on drag
+            const body3D = document.getElementById('body3D');
+            let isDragging = false, startX, rotY = 0;
+            body3D.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; });
+            body3D.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                rotY += dx * 0.5;
+                body3D.style.transform = `rotateY(${rotY}deg)`;
+                startX = e.clientX;
+            });
+            body3D.addEventListener('mouseup', () => { isDragging = false; });
+            body3D.addEventListener('mouseleave', () => { isDragging = false; });
+        }
+        
+        function showBodyPartSymptoms(part) {
+            const symptoms = {
+                'head': ['headache','dizziness','fever','blurred_vision','confusion'],
+                'chest': ['chest_pain','shortness_breath','cough','rapid_heartbeat'],
+                'abdomen': ['abdominal_pain','nausea','vomiting','diarrhea','constipation'],
+                'left_arm': ['arm_pain','numbness','tingling','weakness'],
+                'right_arm': ['arm_pain','numbness','tingling','weakness'],
+                'left_leg': ['leg_pain','swelling','cramps','weakness'],
+                'right_leg': ['leg_pain','swelling','cramps','weakness']
+            };
+            const list = symptoms[part] || ['pain'];
+            document.getElementById('bodyPartSymptoms').innerHTML = list.map(s => 
+                `<span class="badge bg-light text-dark me-1 mb-1" style="cursor:pointer;border:1px solid #ddd;" onclick="toggleSymptom('${s}')">${s.replace(/_/g,' ')} ${selectedSymptoms.includes(s)?'✓':''}</span>`
+            ).join('');
+        }
+        
+        function toggleSymptom(s) {
+            const idx = selectedSymptoms.indexOf(s);
+            idx > -1 ? selectedSymptoms.splice(idx,1) : selectedSymptoms.push(s);
+            document.getElementById('selectedSymptomsList').innerHTML = selectedSymptoms.length ? 
+                selectedSymptoms.map(s => `<span class="badge bg-success me-1">${s.replace(/_/g,' ')}</span>`).join('') : 
+                '<span class="text-muted">None</span>';
+        }
+        
+        // ============ SYMPTOM ANALYSIS ============
+        async function analyzeSymptoms() {
+            if (selectedSymptoms.length === 0) { toast('Select symptoms first', 'warning'); return; }
+            
+            const data = {
+                symptoms: selectedSymptoms,
+                duration: document.getElementById('symptomDuration').value,
+                severity: parseInt(document.getElementById('severitySlider').value)
+            };
+            
+            showLoading('Analyzing symptoms...');
+            try {
+                const res = await fetch(API + '/symptoms/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                hideLoading();
+                
+                if (result.success) {
+                    document.getElementById('symptomResults').innerHTML = result.data.findings.map(f => `
+                        <div class="risk-item ${f.urgency==='urgent'?'high':'medium'} mt-2">
+                            <strong><i class="fas ${f.icon} me-2"></i>${f.disease}</strong>
+                            <span class="float-end fw-bold">${f.confidence}%</span>
+                            <p class="small mb-0 mt-1">${f.message}</p>
+                            <small class="text-success">✅ ${f.action}</small>
+                        </div>
+                    `).join('');
+                    toast(`${result.data.findings.length} condition(s) found`, 'info');
+                }
+            } catch (err) {
+                hideLoading();
+                toast('Server unavailable', 'error');
+            }
+        }
+        
+        // ============ HERBS ============
+        async function loadHerbs() {
+            try {
+                const res = await fetch(API + '/herbs');
+                const data = await res.json();
+                if (data.success) { allHerbs = data.data; renderHerbs(allHerbs); }
+            } catch (err) {
+                allHerbs = [
+                    { id:'tena_adam', name:'Tena Adam', scientific:'Ruta chalepensis', icon:'fa-leaf', uses:'Stomach pain, headache, fever', warnings:['Avoid with blood thinners'] },
+                    { id:'moringa', name:'Moringa', scientific:'Moringa stenopetala', icon:'fa-seedling', uses:'Malnutrition, BP, diabetes', warnings:['Monitor blood sugar'] },
+                    { id:'gesho', name:'Gesho', scientific:'Rhamnus prinoides', icon:'fa-tree', uses:'Digestion, malaria', warnings:['May interact with diabetes meds'] },
+                    { id:'neem', name:'Neem', scientific:'Azadirachta indica', icon:'fa-tree', uses:'Malaria, skin diseases', warnings:['Not for pregnant women'] }
+                ];
+                renderHerbs(allHerbs);
+            }
+        }
+        
+        function renderHerbs(herbs) {
+            document.getElementById('herbList').innerHTML = herbs.map(h => `
+                <div class="herb-card" onclick="showHerbDetail('${h.id}')">
+                    <i class="fas ${h.icon||'fa-leaf'} text-success fs-4"></i>
+                    <h6 class="mt-1 mb-0">${h.name}</h6>
+                    <small class="text-purple">${h.scientific}</small>
+                    <p class="small text-muted mb-1">${h.uses}</p>
+                    ${h.warnings ? h.warnings.map(w => `<small class="text-danger">⚠️ ${w}</small><br>`).join('') : ''}
+                </div>
+            `).join('');
+        }
+        
+        function filterHerbs() {
+            const query = document.getElementById('herbSearch').value.toLowerCase();
+            const cat = document.getElementById('herbCategory').value;
+            let filtered = allHerbs;
+            if (cat !== 'all') filtered = filtered.filter(h => h.category && h.category.includes(cat));
+            if (query) filtered = filtered.filter(h => h.name.toLowerCase().includes(query) || h.uses.toLowerCase().includes(query));
+            renderHerbs(filtered);
+        }
+        
+        function showHerbDetail(id) {
+            const herb = allHerbs.find(h => h.id === id);
+            if (!herb) return;
+            document.getElementById('herbDetail').style.display = 'block';
+            document.getElementById('herbDetail').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <button class="btn btn-sm btn-outline-secondary float-end" onclick="document.getElementById('herbDetail').style.display='none'">✕</button>
+                        <h5><i class="fas ${herb.icon||'fa-leaf'} text-success me-2"></i>${herb.name}</h5>
+                        <small class="text-purple">${herb.scientific}</small>
+                        <p class="mt-2">${herb.uses}</p>
+                        ${herb.preparations ? herb.preparations.map(p => `<p><strong>${p.method}:</strong> ${p.directions}<br><small>Dosage: ${p.dosage}</small></p>`).join('') : ''}
+                        ${herb.warnings ? `<div class="alert alert-danger small">${herb.warnings.map(w => '⚠️ '+w).join('<br>')}</div>` : ''}
+                        <p class="small text-muted">📍 ${herb.regions||'Various Ethiopian regions'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('herbDetail').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ============ AI CHAT ============
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML += `<div class="chat-msg chat-user">${msg}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            try {
+                const res = await fetch(API + '/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, language: 'en' })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    chatBox.innerHTML += `<div class="chat-msg chat-bot"><strong>🤖 Grok:</strong> ${data.data.response.en || data.data.response}</div>`;
+                }
+            } catch (err) {
+                chatBox.innerHTML += `<div class="chat-msg chat-bot"><strong>🤖 Grok:</strong> I'm currently offline. Please try again later.</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // ============ INIT ============
+        init();
+        console.log('🚀 EthioHealth AI Pro Dashboard Ready');
+    </script>
+</body>
+</html>
