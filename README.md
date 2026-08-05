@@ -33,7 +33,7 @@
 
 ## 📖 Overview
 
-**EthioHealth AI Pro** is a comprehensive AI-powered health monitoring application designed specifically for Ethiopian communities. It combines modern AI technology (Grok-style analysis) with Ethiopia's rich traditional medicine knowledge.
+**EthioHealth AI Pro** is a comprehensive AI-powered health monitoring application designed specifically for Ethiopian communities. It combines modern AI technology with Ethiopia's rich traditional medicine knowledge.
 
 ### Why EthioHealth?
 
