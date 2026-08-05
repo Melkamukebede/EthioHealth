@@ -24,13 +24,11 @@
 - [Usage Guide](#usage-guide)
 - [Disease Detection](#disease-detection)
 - [Emergency Features](#emergency-features)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+
 
 ---
 
-## 📖 Overview
+##  Overview
 
 **EthioHealth AI Pro** is a comprehensive AI-powered health monitoring application designed specifically for Ethiopian communities. It combines modern AI technology with Ethiopia's rich traditional medicine knowledge.
 
@@ -101,28 +99,6 @@ Ethiopia faces unique healthcare challenges:
 | **Frontend** | [https://melkamukebede.github.io/EthioHealth/](https://firstaid-98y.pages.dev/) |
 | **Backend API** | [https://ethiohalth-api.onrender.com/](https://ethiohalth-api.onrender.com/) |
 | **API Health Check** | [https://ethiohalth-api.onrender.com/api/health](https://ethiohalth-api.onrender.com/api/health) |
-
----
-
-##  Screenshots
-
-### Login Page
-![Login](screenshots/login.png)
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Health Analysis
-![Analysis](screenshots/analysis.png)
-
-### Body Map Symptom Checker
-![Body Map](screenshots/body-map.png)
-
-### Traditional Medicine
-![Herbs](screenshots/herbs.png)
-
-### AI Chat
-![Chat](screenshots/chat.png)
 
 ---
 
