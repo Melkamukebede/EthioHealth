@@ -445,9 +445,7 @@ app.post('/api/v1/herbs/check-interactions', (req, res) => {
     });
 });
 
-// ============================================
 // HEALTH ANALYSIS (ORIGINAL FEATURE)
-// ============================================
 app.post('/api/v1/health/analyze', (req, res) => {
     try {
         const { systolic, diastolic, glucose, bmi, temperature, age, symptoms } = req.body;
@@ -569,9 +567,7 @@ app.post('/api/v1/health/analyze', (req, res) => {
     }
 });
 
-// ============================================
 // HERB DATABASE
-// ============================================
 app.get('/api/v1/herbs', (req, res) => {
     const herbs = [
         { id: 'tena_adam', name: 'Tena Adam', scientific: 'Ruta chalepensis', family: 'Rutaceae', icon: 'fa-leaf',
@@ -649,9 +645,7 @@ app.get('/api/v1/herbs', (req, res) => {
     res.json({ success: true, count: herbs.length, data: herbs });
 });
 
-// ============================================
 // HEALTH TRENDS
-// ============================================
 app.get('/api/v1/health/trends', (req, res) => {
     if (analysisHistory.length === 0) {
         return res.json({ success: true, data: [], message: 'No analysis history yet' });
@@ -668,7 +662,6 @@ app.get('/api/v1/health/trends', (req, res) => {
     });
 });
 
-// ============================================
 // VOICE PROCESSING
 // ============================================
 app.post('/api/v1/voice/process', (req, res) => {
