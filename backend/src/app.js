@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const compression = require('compression');
 
 const app = express();
-// Add these at the top with other requires
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
@@ -12,13 +11,10 @@ const path = require('path');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ethiohealth-secret-2024';
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
-
-// Ensure data directory
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
 
-// Auth middleware
 function verifyToken(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -31,20 +27,15 @@ function verifyToken(req, res, next) {
         return res.status(401).json({ success: false, message: 'Invalid token' });
     }
 }
-
-///neww to check
-// Middleware
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
 app.use(morgan('dev'));
 
-// ============ DATA STORAGE ============
 let analysisHistory = [];
 let emergencyContacts = [];
 
-// ============ HOME ROUTE ============
 app.get('/', (req, res) => {
     res.json({
         success: true,
@@ -55,8 +46,6 @@ app.get('/', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
-
-// ============ HEALTH CHECK ============
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
@@ -65,9 +54,8 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// ============================================
 // FEATURE 1: AI HEALTH CHAT (GROK AI)
-// ============================================
+
 app.post('/api/v1/chat', (req, res) => {
     const { message, language } = req.body;
 
@@ -84,73 +72,73 @@ app.post('/api/v1/chat', (req, res) => {
     // ===== HEADACHE =====
     if (lower.includes('headache') || lower.includes('ራስ') || lower.includes('mataa')) {
         response = {
-            en: '🩺 Headaches can be caused by stress, dehydration, high blood pressure, or altitude (common in Ethiopia).\n\n💧 TIPS:\n1. Drink 2-3 liters of water daily\n2. Check your blood pressure at a health center\n3. Rest in a quiet, dark room\n4. Avoid excessive coffee (even Ethiopian buna!)\n\n🌿 TRADITIONAL: Tena Adam tea or Damakese steam inhalation\n\n⚠️ See a doctor if: headache is severe, sudden, or with fever/stiff neck.',
-            am: '🩺 ራስ ምታት በጭንቀት፣ በውሃ እጥረት፣ በደም ግፊት ወይም በከፍታ (በኢትዮጵያ የተለመደ) ሊከሰት ይችላል።\n\n💧 ምክሮች:\n1. በቀን 2-3 ሊትር ውሃ ይጠጡ\n2. የደም ግፊትዎን በጤና ጣቢያ ያረጋግጡ\n3. ጸጥ ባለ ጨለማ ክፍል ያርፉ\n\n🌿 ባህላዊ: ጤና አዳም ሻይ ወይም ዳማከሴ እንፋሎት\n\n⚠️ ከሆነ ሐኪም ያማክሩ: ከባድ፣ ድንገተኛ ወይም ከትኩሳት/የአንገት መቆጣት ጋር',
-            om: '🩺 Mataa bowwuun dhiphina, dheebuu, dhiibbaa dhiigaa ykn olka\'iinsa (Itoophiyaa keessatti beekamaa) irraa dhufuu danda\'a.\n\n💧 GORSA:\n1. Guyyaatti liitira 2-3 bishaan dhugi\n2. Dhiibbaa dhiigaa kee buufata fayyaatti ilaali\n3. Kutaa callisaa fi dukkanaa\'aa keessatti boqodhu\n\n🌿 AADAA: Shaayii Tena Adam ykn hurka Damakese\n\n⚠️ Yoo ta\'e doktara ilaali: cimaa, tasa, ykn ho\'ina qaamaa/morma qabanaa\'aa wajjin'
+            en: ' Headaches can be caused by stress, dehydration, high blood pressure, or altitude (common in Ethiopia).\n\n TIPS:\n1. Drink 2-3 liters of water daily\n2. Check your blood pressure at a health center\n3. Rest in a quiet, dark room\n4. Avoid excessive coffee (even Ethiopian buna!)\n\n🌿 TRADITIONAL: Tena Adam tea or Damakese steam inhalation\n\n⚠️ See a doctor if: headache is severe, sudden, or with fever/stiff neck.',
+            am: ' ራስ ምታት በጭንቀት፣ በውሃ እጥረት፣ በደም ግፊት ወይም በከፍታ (በኢትዮጵያ የተለመደ) ሊከሰት ይችላል።\n\n ምክሮች:\n1. በቀን 2-3 ሊትር ውሃ ይጠጡ\n2. የደም ግፊትዎን በጤና ጣቢያ ያረጋግጡ\n3. ጸጥ ባለ ጨለማ ክፍል ያርፉ\n\n🌿 ባህላዊ: ጤና አዳም ሻይ ወይም ዳማከሴ እንፋሎት\n\n⚠️ ከሆነ ሐኪም ያማክሩ: ከባድ፣ ድንገተኛ ወይም ከትኩሳት/የአንገት መቆጣት ጋር',
+            om: ' Mataa bowwuun dhiphina, dheebuu, dhiibbaa dhiigaa ykn olka\'iinsa (Itoophiyaa keessatti beekamaa) irraa dhufuu danda\'a.\n\n GORSA:\n1. Guyyaatti liitira 2-3 bishaan dhugi\n2. Dhiibbaa dhiigaa kee buufata fayyaatti ilaali\n3. Kutaa callisaa fi dukkanaa\'aa keessatti boqodhu\n\n🌿 AADAA: Shaayii Tena Adam ykn hurka Damakese\n\n⚠️ Yoo ta\'e doktara ilaali: cimaa, tasa, ykn ho\'ina qaamaa/morma qabanaa\'aa wajjin'
         };
     }
     // ===== MALARIA =====
     else if (lower.includes('malaria') || lower.includes('ወባ') || lower.includes('busaa') || (lower.includes('fever') && lower.includes('chills'))) {
         response = {
-            en: '🦟 MALARIA - Serious concern in Ethiopia (60% of population at risk)\n\n🔴 SYMPTOMS: Fever, chills, sweating, headache, muscle pain, fatigue, nausea\n\n✅ ACTION:\n1. Get FREE RDT test at any Ethiopian health center\n2. Treatment: Coartem (Artemether-Lumefantrine) - available free at public facilities\n3. Start treatment within 24 hours of symptoms\n\n🛡️ PREVENTION:\n• Sleep under insecticide-treated nets\n• Eliminate standing water around home\n• Indoor residual spraying\n\n🌿 TRADITIONAL SUPPORT (NOT replacement): Neem tea, Gesho tea\n\n⚠️ WARNING: Malaria can be fatal if untreated. Seek testing immediately!',
-            am: '🦟 ወባ - በኢትዮጵያ ከባድ ችግር (60% ህዝብ ለአደጋ ተጋላጭ)\n\n🔴 ምልክቶች: ትኩሳት፣ ብርድ ብርድ፣ ላብ፣ ራስ ምታት፣ የጡንቻ ህመም፣ ድካም፣ ማቅለሽለሽ\n\n✅ እርምጃ:\n1. በማንኛውም የኢትዮጵያ ጤና ጣቢያ ነፃ ምርመራ ያድርጉ\n2. ህክምና: Coartem - በመንግስት ተቋማት በነፃ ይገኛል\n\n🛡️ መከላከያ:\n• በታከመ አጎበር ስር ይተኙ\n• የቆመ ውሃ ያስወግዱ\n\n🌿 ባህላዊ ድጋፍ: ኒም ሻይ፣ ጌሾ ሻይ\n\n⚠️ ማስጠንቀቂያ: ወባ ህክምና ካልተደረገለት ለሞት ሊዳርግ ይችላል!',
-            om: '🦟 BUSAA - Itoophiyaa keessatti rakkoo guddaa (60% uummataa balaaf saaxilama)\n\n🔴 MALLATTOOLEE: Ho\'ina qaamaa, qorramuu, dafqii, mataa bowwuu, dhukkubbii maashaa, dadhabbii, lololaa\n\n✅ GOCHA:\n1. Buufata fayyaa Itoophiyaa kamiyyuu keessatti qormaata RDT tolaa argadhu\n2. Wal\'aansa: Coartem - buufata mootummaa keessatti tolaan argama\n\n🛡️ ITTISA:\n• Saaftuu busaa fayyadamaa\n• Bishaan dhaabatuu balleessaa\n\n⚠️ AKEekKACHIISA: Busaan yoo wal\'aansi hin godhamin du\'a fiduu danda\'a!'
+            en: ' MALARIA - Serious concern in Ethiopia (60% of population at risk)\n\n🔴 SYMPTOMS: Fever, chills, sweating, headache, muscle pain, fatigue, nausea\n\n✅ ACTION:\n1. Get FREE RDT test at any Ethiopian health center\n2. Treatment: Coartem (Artemether-Lumefantrine) - available free at public facilities\n3. Start treatment within 24 hours of symptoms\n\n🛡️ PREVENTION:\n• Sleep under insecticide-treated nets\n• Eliminate standing water around home\n• Indoor residual spraying\n\n🌿 TRADITIONAL SUPPORT (NOT replacement): Neem tea, Gesho tea\n\n⚠️ WARNING: Malaria can be fatal if untreated. Seek testing immediately!',
+            am: ' ወባ - በኢትዮጵያ ከባድ ችግር (60% ህዝብ ለአደጋ ተጋላጭ)\n\n🔴 ምልክቶች: ትኩሳት፣ ብርድ ብርድ፣ ላብ፣ ራስ ምታት፣ የጡንቻ ህመም፣ ድካም፣ ማቅለሽለሽ\n\n✅ እርምጃ:\n1. በማንኛውም የኢትዮጵያ ጤና ጣቢያ ነፃ ምርመራ ያድርጉ\n2. ህክምና: Coartem - በመንግስት ተቋማት በነፃ ይገኛል\n\n🛡️ መከላከያ:\n• በታከመ አጎበር ስር ይተኙ\n• የቆመ ውሃ ያስወግዱ\n\n🌿 ባህላዊ ድጋፍ: ኒም ሻይ፣ ጌሾ ሻይ\n\n⚠️ ማስጠንቀቂያ: ወባ ህክምና ካልተደረገለት ለሞት ሊዳርግ ይችላል!',
+            om: ' BUSAA - Itoophiyaa keessatti rakkoo guddaa (60% uummataa balaaf saaxilama)\n\n🔴 MALLATTOOLEE: Ho\'ina qaamaa, qorramuu, dafqii, mataa bowwuu, dhukkubbii maashaa, dadhabbii, lololaa\n\n✅ GOCHA:\n1. Buufata fayyaa Itoophiyaa kamiyyuu keessatti qormaata RDT tolaa argadhu\n2. Wal\'aansa: Coartem - buufata mootummaa keessatti tolaan argama\n\n🛡️ ITTISA:\n• Saaftuu busaa fayyadamaa\n• Bishaan dhaabatuu balleessaa\n\n⚠️ AKEekKACHIISA: Busaan yoo wal\'aansi hin godhamin du\'a fiduu danda\'a!'
         };
     }
     // ===== BLOOD PRESSURE =====
     else if (lower.includes('pressure') || lower.includes('bp') || lower.includes('የደም') || lower.includes('dhiibbaa')) {
         response = {
-            en: '🩸 BLOOD PRESSURE - 16-20% of Ethiopian adults affected\n\n📊 NORMAL: Below 120/80 mmHg\n⚠️ ELEVATED: 120-129/<80\n🔴 HIGH: 130+/80+\n\n✅ MANAGEMENT:\n1. Reduce salt in wot and injera\n2. Walk 30 minutes daily\n3. Check BP weekly at health center (free)\n4. Limit coffee to 2 cups/day\n\n💊 MEDICINES: Enalapril, Amlodipine (available at Ethiopian pharmacies)\n\n🌿 TRADITIONAL: Moringa leaf powder, Tosign tea\n\n⚠️ Untreated hypertension causes stroke, heart attack, kidney failure.',
-            am: '🩸 የደም ግፊት - 16-20% የኢትዮጵያ አዋቂዎች ይጎዳሉ\n\n📊 መደበኛ: ከ120/80 በታች\n⚠️ ከፍ ያለ: 120-129/<80\n🔴 ከፍተኛ: 130+/80+\n\n✅ አያያዝ:\n1. በወጥ እና እንጀራ ውስጥ ጨው ይቀንሱ\n2. በየቀኑ 30 ደቂቃ ይራመዱ\n3. በየሳምንቱ የደም ግፊት ያረጋግጡ (በነፃ)\n\n💊 መድሀኒቶች: Enalapril, Amlodipine\n\n🌿 ባህላዊ: የሞሪንጋ ቅጠል ዱቄት፣ ጦስኝ ሻይ\n\n⚠️ ያልታከመ የደም ግፊት ስትሮክ፣ የልብ ድካም፣ የኩላሊት ችግር ያስከትላል',
-            om: '🩸 DHIIBBAA DHIIGAA - 16-20% namoota Itoophiyaa irratti dhiibbaa qaba\n\n📊 IDILEE: 120/80 gad\n⚠️ OLKA\'AA: 120-129/<80\n🔴 GUDDAA: 130+/80+\n\n✅ TO\'ANNNAA:\n1. Wot fi buddeena keessatti soogidda hir\'isi\n2. Guyyaatti daqiiqaa 30 deddeebi\'i\n3. Torbanitti buufata fayyaatti BP ilaali (tola)\n\n💊 QORICHA: Enalapril, Amlodipine\n\n🌿 AADAA: Daakuu baala Moringa, shaayii Tosign\n\n⚠️ Dhiibbaan dhiigaa kan hin yaalamne stroke, dhukkuba onnee, fi rakkoo kalee fida'
+            en: '🩸 BLOOD PRESSURE - 16-20% of Ethiopian adults affected\n\n NORMAL: Below 120/80 mmHg\n⚠️ ELEVATED: 120-129/<80\n🔴 HIGH: 130+/80+\n\n✅ MANAGEMENT:\n1. Reduce salt in wot and injera\n2. Walk 30 minutes daily\n3. Check BP weekly at health center (free)\n4. Limit coffee to 2 cups/day\n\n💊 MEDICINES: Enalapril, Amlodipine (available at Ethiopian pharmacies)\n\n🌿 TRADITIONAL: Moringa leaf powder, Tosign tea\n\n⚠️ Untreated hypertension causes stroke, heart attack, kidney failure.',
+            am: '🩸 የደም ግፊት - 16-20% የኢትዮጵያ አዋቂዎች ይጎዳሉ\n\n መደበኛ: ከ120/80 በታች\n⚠️ ከፍ ያለ: 120-129/<80\n🔴 ከፍተኛ: 130+/80+\n\n✅ አያያዝ:\n1. በወጥ እና እንጀራ ውስጥ ጨው ይቀንሱ\n2. በየቀኑ 30 ደቂቃ ይራመዱ\n3. በየሳምንቱ የደም ግፊት ያረጋግጡ (በነፃ)\n\n💊 መድሀኒቶች: Enalapril, Amlodipine\n\n🌿 ባህላዊ: የሞሪንጋ ቅጠል ዱቄት፣ ጦስኝ ሻይ\n\n⚠️ ያልታከመ የደም ግፊት ስትሮክ፣ የልብ ድካም፣ የኩላሊት ችግር ያስከትላል',
+            om: '🩸 DHIIBBAA DHIIGAA - 16-20% namoota Itoophiyaa irratti dhiibbaa qaba\n\n IDILEE: 120/80 gad\n⚠️ OLKA\'AA: 120-129/<80\n🔴 GUDDAA: 130+/80+\n\n✅ TO\'ANNNAA:\n1. Wot fi buddeena keessatti soogidda hir\'isi\n2. Guyyaatti daqiiqaa 30 deddeebi\'i\n3. Torbanitti buufata fayyaatti BP ilaali (tola)\n\n💊 QORICHA: Enalapril, Amlodipine\n\n🌿 AADAA: Daakuu baala Moringa, shaayii Tosign\n\n⚠️ Dhiibbaan dhiigaa kan hin yaalamne stroke, dhukkuba onnee, fi rakkoo kalee fida'
         };
     }
     // ===== DIABETES =====
     else if (lower.includes('diabetes') || lower.includes('sugar') || lower.includes('ስኳር') || lower.includes('sukkaara')) {
         response = {
-            en: '🍬 DIABETES - Growing concern in Ethiopia (5-8% of adults)\n\n🔴 WARNING SIGNS: Frequent urination, excessive thirst, extreme hunger, unexplained weight loss, fatigue, blurred vision\n\n✅ MANAGEMENT:\n1. Exercise 30 minutes daily\n2. Eat teff injera instead of white bread\n3. Add Moringa to your diet\n4. Monitor blood sugar regularly\n\n💊 MEDICINES: Metformin (first-line), Glibenclamide, Insulin\n\n🌿 TRADITIONAL: Grawa tea (very bitter!), Moringa powder\n\n⚠️ Diabetes can cause blindness, kidney failure, and amputation if untreated.',
-            am: '🍬 የስኳር ህመም - በኢትዮጵያ እየጨመረ የመጣ (5-8% አዋቂዎች)\n\n🔴 ምልክቶች: ተደጋጋሚ ሽንት፣ ከፍተኛ ጥማት፣ ከፍተኛ ረሃብ፣ ክብደት መቀነስ፣ ድካም፣ የማየት ብዥታ\n\n✅ አያያዝ:\n1. በየቀኑ 30 ደቂቃ የአካል ብቃት\n2. ነጭ ዳቦ ሳይሆን ጤፍ እንጀራ ይብሉ\n3. ሞሪንጋ ወደ ምግብዎ ይጨምሩ\n\n💊 መድሀኒቶች: Metformin, Glibenclamide, Insulin\n\n🌿 ባህላዊ: ግራዋ ሻይ (በጣም መራራ!)፣ የሞሪንጋ ዱቄት',
-            om: '🍬 SUKKAARA - Itoophiyaa keessatti dabalaa jira (5-8% namoota)\n\n🔴 MALLATTOOLEE: Finyoo yeroo baay\'ee, dheebuu garmalee, beela garmalee, ulfaatina hir\'achuu, dadhabbii, ija dukkanaa\'uu\n\n✅ TO\'ANNNAA:\n1. Guyyaatti daqiiqaa 30 socho\'i\n2. Buddeena teff fayyadami\n3. Moringa nyaata kee keessatti dabali\n\n💊 QORICHA: Metformin, Glibenclamide, Insulin\n\n🌿 AADAA: Shaayii Grawa (baay\'ee hadhaa!)'
+            en: ' DIABETES - Growing concern in Ethiopia (5-8% of adults)\n\n🔴 WARNING SIGNS: Frequent urination, excessive thirst, extreme hunger, unexplained weight loss, fatigue, blurred vision\n\n✅ MANAGEMENT:\n1. Exercise 30 minutes daily\n2. Eat teff injera instead of white bread\n3. Add Moringa to your diet\n4. Monitor blood sugar regularly\n\n💊 MEDICINES: Metformin (first-line), Glibenclamide, Insulin\n\n🌿 TRADITIONAL: Grawa tea (very bitter!), Moringa powder\n\n⚠️ Diabetes can cause blindness, kidney failure, and amputation if untreated.',
+            am: ' የስኳር ህመም - በኢትዮጵያ እየጨመረ የመጣ (5-8% አዋቂዎች)\n\n🔴 ምልክቶች: ተደጋጋሚ ሽንት፣ ከፍተኛ ጥማት፣ ከፍተኛ ረሃብ፣ ክብደት መቀነስ፣ ድካም፣ የማየት ብዥታ\n\n✅ አያያዝ:\n1. በየቀኑ 30 ደቂቃ የአካል ብቃት\n2. ነጭ ዳቦ ሳይሆን ጤፍ እንጀራ ይብሉ\n3. ሞሪንጋ ወደ ምግብዎ ይጨምሩ\n\n💊 መድሀኒቶች: Metformin, Glibenclamide, Insulin\n\n🌿 ባህላዊ: ግራዋ ሻይ (በጣም መራራ!)፣ የሞሪንጋ ዱቄት',
+            om: ' SUKKAARA - Itoophiyaa keessatti dabalaa jira (5-8% namoota)\n\n🔴 MALLATTOOLEE: Finyoo yeroo baay\'ee, dheebuu garmalee, beela garmalee, ulfaatina hir\'achuu, dadhabbii, ija dukkanaa\'uu\n\n✅ TO\'ANNNAA:\n1. Guyyaatti daqiiqaa 30 socho\'i\n2. Buddeena teff fayyadami\n3. Moringa nyaata kee keessatti dabali\n\n💊 QORICHA: Metformin, Glibenclamide, Insulin\n\n🌿 AADAA: Shaayii Grawa (baay\'ee hadhaa!)'
         };
     }
     // ===== DIET & NUTRITION =====
     else if (lower.includes('diet') || lower.includes('food') || lower.includes('eat') || lower.includes('ምግብ') || lower.includes('nyaata')) {
         response = {
-            en: '🥗 ETHIOPIAN HEALTHY DIET TIPS\n\n✅ SUPERFOODS:\n• Teff injera - gluten-free, rich in iron and calcium\n• Moringa leaves - vitamins A, C, iron, protein\n• Lentils (Misir) - protein and fiber\n• Kale (Gomen) - iron and vitamins\n• Shiro - chickpea protein\n\n⚠️ REDUCE:\n• Salt in wot and stews\n• Oil in cooking\n• Raw meat (kitfo) consumption\n• Sugary drinks and sweets\n\n💡 TIP: Add Moringa powder to shiro or wot for extra nutrition!\n\n🌿 TRADITIONAL DIGESTION AID: Koseret, Tena Adam tea',
-            am: '🥗 የኢትዮጵያ ጤናማ አመጋገብ ምክሮች\n\n✅ ልዩ ምግቦች:\n• ጤፍ እንጀራ - ከግሉተን ነፃ፣ በብረት የበለፀገ\n• የሞሪንጋ ቅጠል - ቫይታሚን ኤ፣ ሲ፣ ብረት፣ ፕሮቲን\n• ምስር - ፕሮቲን እና ፋይበር\n• ጎመን - ብረት እና ቫይታሚኖች\n• ሽሮ - የሽምብራ ፕሮቲን\n\n⚠️ ይቀንሱ:\n• በወጥ ውስጥ ጨው\n• የምግብ ዘይት\n• ጥሬ ስጋ (ክትፎ)\n• ስኳር ያላቸው መጠጦች',
-            om: '🥗 GORSA NYAATA FAYYAA ITOOPHIYAA\n\n✅ NYAATA IJOO:\n• Buddeenni Teff - gluten-free, ayirenii fi calcium qaba\n• Baala Moringa - vaayitaamin A, C, ayirenii, pirootiinii\n• Misira - pirootiinii fi fiber\n• Gomeena - ayirenii fi vaayitaaminoota\n• Shiro - pirootiinii shumburaa\n\n⚠️ HIR\'ISI:\n• Wot keessatti soogidda\n• Zayitii nyaataa\n• Foon dheedhii (kitfo)\n• Dhugaatii sukkaara qaban'
+            en: ' ETHIOPIAN HEALTHY DIET TIPS\n\n✅ SUPERFOODS:\n• Teff injera - gluten-free, rich in iron and calcium\n• Moringa leaves - vitamins A, C, iron, protein\n• Lentils (Misir) - protein and fiber\n• Kale (Gomen) - iron and vitamins\n• Shiro - chickpea protein\n\n⚠️ REDUCE:\n• Salt in wot and stews\n• Oil in cooking\n• Raw meat (kitfo) consumption\n• Sugary drinks and sweets\n\n💡 TIP: Add Moringa powder to shiro or wot for extra nutrition!\n\n🌿 TRADITIONAL DIGESTION AID: Koseret, Tena Adam tea',
+            am: ' የኢትዮጵያ ጤናማ አመጋገብ ምክሮች\n\n✅ ልዩ ምግቦች:\n• ጤፍ እንጀራ - ከግሉተን ነፃ፣ በብረት የበለፀገ\n• የሞሪንጋ ቅጠል - ቫይታሚን ኤ፣ ሲ፣ ብረት፣ ፕሮቲን\n• ምስር - ፕሮቲን እና ፋይበር\n• ጎመን - ብረት እና ቫይታሚኖች\n• ሽሮ - የሽምብራ ፕሮቲን\n\n⚠️ ይቀንሱ:\n• በወጥ ውስጥ ጨው\n• የምግብ ዘይት\n• ጥሬ ስጋ (ክትፎ)\n• ስኳር ያላቸው መጠጦች',
+            om: ' GORSA NYAATA FAYYAA ITOOPHIYAA\n\n✅ NYAATA IJOO:\n• Buddeenni Teff - gluten-free, ayirenii fi calcium qaba\n• Baala Moringa - vaayitaamin A, C, ayirenii, pirootiinii\n• Misira - pirootiinii fi fiber\n• Gomeena - ayirenii fi vaayitaaminoota\n• Shiro - pirootiinii shumburaa\n\n⚠️ HIR\'ISI:\n• Wot keessatti soogidda\n• Zayitii nyaataa\n• Foon dheedhii (kitfo)\n• Dhugaatii sukkaara qaban'
         };
     }
     // ===== TRADITIONAL MEDICINE =====
     else if (lower.includes('traditional') || lower.includes('herb') || lower.includes('ባህላዊ') || lower.includes('aadaa') || lower.includes('natural')) {
         response = {
-            en: '🌿 ETHIOPIAN TRADITIONAL MEDICINE DATABASE\n\n📚 8 DOCUMENTED HERBS:\n\n1. Tena Adam (Ruta chalepensis) - Stomach pain, headache, fever\n2. Moringa (Moringa stenopetala) - Malnutrition, BP, diabetes\n3. Gesho (Rhamnus prinoides) - Digestion, malaria, worms\n4. Damakese (Ocimum lamiifolium) - Fever, cold, cough\n5. Neem (Azadirachta indica) - Malaria, skin diseases\n6. Tosign (Thymus schimperi) - Cough, BP, digestion\n7. Koseret (Lippia adoensis) - Digestion, parasites\n8. Grawa (Vernonia amygdalina) - Malaria, diabetes\n\n⚠️ IMPORTANT: Always consult healthcare provider before using herbs with modern medicines!',
-            am: '🌿 የኢትዮጵያ ባህላዊ ሕክምና ዳታቤዝ\n\n📚 8 የተመዘገቡ እፅዋት:\n\n1. ጤና አዳም - የሆድ ህመም፣ ራስ ምታት፣ ትኩሳት\n2. ሞሪንጋ - የተመጣጠነ ምግብ እጥረት፣ የደም ግፊት፣ ስኳር\n3. ጌሾ - የምግብ መፍጨት፣ ወባ፣ ትሎች\n4. ዳማከሴ - ትኩሳት፣ ጉንፋን፣ ሳል\n5. ኒም - ወባ፣ የቆዳ በሽታዎች\n6. ጦስኝ - ሳል፣ የደም ግፊት፣ የምግብ መፍጨት\n7. ኮሰረት - የምግብ መፍጨት፣ ትሎች\n8. ግራዋ - ወባ፣ ስኳር\n\n⚠️ አስፈላጊ: እፅዋትን ከዘመናዊ መድሀኒቶች ጋር ከመጠቀምዎ በፊት ሐኪም ያማክሩ!',
-            om: '🌿 QORICHA AADAA ITOOPHIYAA\n\n📚 MARGOOTA 8 GALMEEFFAMAN:\n\n1. Tena Adam - Dhukkubbii garaa, mataa bowwuu, ho\'ina\n2. Moringa - Hangina soorataa, dhiibbaa dhiigaa, sukkaara\n3. Gesho - Bullaa\'insa, busaa, raammoo\n4. Damakese - Ho\'ina, qufaa, qufaa\n5. Neem - Busaa, dhukkubbii gogaa\n6. Tosign - Qufaa, dhiibbaa dhiigaa, bullaa\'insa\n7. Koseret - Bullaa\'insa, raammoo\n8. Grawa - Busaa, sukkaara\n\n⚠️ BARBAACHISAA: Margoota qoricha ammayyaa wajjin fayyadamuu dura ogeessa fayyaa mari\'adhu!'
+            en: ' ETHIOPIAN TRADITIONAL MEDICINE DATABASE\n\n 8 DOCUMENTED HERBS:\n\n1. Tena Adam (Ruta chalepensis) - Stomach pain, headache, fever\n2. Moringa (Moringa stenopetala) - Malnutrition, BP, diabetes\n3. Gesho (Rhamnus prinoides) - Digestion, malaria, worms\n4. Damakese (Ocimum lamiifolium) - Fever, cold, cough\n5. Neem (Azadirachta indica) - Malaria, skin diseases\n6. Tosign (Thymus schimperi) - Cough, BP, digestion\n7. Koseret (Lippia adoensis) - Digestion, parasites\n8. Grawa (Vernonia amygdalina) - Malaria, diabetes\n\n⚠️ IMPORTANT: Always consult healthcare provider before using herbs with modern medicines!',
+            am: ' የኢትዮጵያ ባህላዊ ሕክምና ዳታቤዝ\n\n 8 የተመዘገቡ እፅዋት:\n\n1. ጤና አዳም - የሆድ ህመም፣ ራስ ምታት፣ ትኩሳት\n2. ሞሪንጋ - የተመጣጠነ ምግብ እጥረት፣ የደም ግፊት፣ ስኳር\n3. ጌሾ - የምግብ መፍጨት፣ ወባ፣ ትሎች\n4. ዳማከሴ - ትኩሳት፣ ጉንፋን፣ ሳል\n5. ኒም - ወባ፣ የቆዳ በሽታዎች\n6. ጦስኝ - ሳል፣ የደም ግፊት፣ የምግብ መፍጨት\n7. ኮሰረት - የምግብ መፍጨት፣ ትሎች\n8. ግራዋ - ወባ፣ ስኳር\n\n⚠️ አስፈላጊ: እፅዋትን ከዘመናዊ መድሀኒቶች ጋር ከመጠቀምዎ በፊት ሐኪም ያማክሩ!',
+            om: ' QORICHA AADAA ITOOPHIYAA\n\n MARGOOTA 8 GALMEEFFAMAN:\n\n1. Tena Adam - Dhukkubbii garaa, mataa bowwuu, ho\'ina\n2. Moringa - Hangina soorataa, dhiibbaa dhiigaa, sukkaara\n3. Gesho - Bullaa\'insa, busaa, raammoo\n4. Damakese - Ho\'ina, qufaa, qufaa\n5. Neem - Busaa, dhukkubbii gogaa\n6. Tosign - Qufaa, dhiibbaa dhiigaa, bullaa\'insa\n7. Koseret - Bullaa\'insa, raammoo\n8. Grawa - Busaa, sukkaara\n\n⚠️ BARBAACHISAA: Margoota qoricha ammayyaa wajjin fayyadamuu dura ogeessa fayyaa mari\'adhu!'
         };
     }
     // ===== EMERGENCY =====
     else if (lower.includes('emergency') || lower.includes('help') || lower.includes('አደጋ') || lower.includes('tasgabbii')) {
         response = {
-            en: '🚨 ETHIOPIAN EMERGENCY NUMBERS:\n\n• Ambulance: 907\n• Police: 991\n• Fire: 939\n• Red Cross: 011-552-72-22\n\n🏥 MAJOR HOSPITALS:\n• Black Lion Hospital (Addis): 011-551-1211\n• St. Paul\'s Hospital (Addis): 011-275-1111\n\n⚠️ For immediate emergencies, call 907 now!',
-            am: '🚨 የኢትዮጵያ የአደጋ ጊዜ ስልክ ቁጥሮች:\n\n• አምቡላንስ: 907\n• ፖሊስ: 991\n• እሳት አደጋ: 939\n• ቀይ መስቀል: 011-552-72-22\n\n🏥 ዋና ሆስፒታሎች:\n• ጥቁር አንበሳ ሆስፒታል: 011-551-1211\n• ቅዱስ ጳውሎስ ሆስፒታል: 011-275-1111\n\n⚠️ ለአስቸኳይ አደጋዎች፣ አሁን 907 ይደውሉ!',
-            om: '🚨 LAKKOOFSOTA TASGABBII ITOOPHIYAA:\n\n• Ambulaansii: 907\n• Poolisii: 991\n• Abidda: 939\n• Adii Dhiiga: 011-552-72-22\n\n🏥 HOSPITAALOTA GUGUDDAA:\n• Black Lion (Finfinne): 011-551-1211\n• St. Paul (Finfinne): 011-275-1111\n\n⚠️ Tasgabbii hatattamaaf, amma 907 bilbili!'
+            en: ' ETHIOPIAN EMERGENCY NUMBERS:\n\n• Ambulance: 907\n• Police: 991\n• Fire: 939\n• Red Cross: 011-552-72-22\n\n MAJOR HOSPITALS:\n• Black Lion Hospital (Addis): 011-551-1211\n• St. Paul\'s Hospital (Addis): 011-275-1111\n\n⚠️ For immediate emergencies, call 907 now!',
+            am: ' የኢትዮጵያ የአደጋ ጊዜ ስልክ ቁጥሮች:\n\n• አምቡላንስ: 907\n• ፖሊስ: 991\n• እሳት አደጋ: 939\n• ቀይ መስቀል: 011-552-72-22\n\n ዋና ሆስፒታሎች:\n• ጥቁር አንበሳ ሆስፒታል: 011-551-1211\n• ቅዱስ ጳውሎስ ሆስፒታል: 011-275-1111\n\n⚠️ ለአስቸኳይ አደጋዎች፣ አሁን 907 ይደውሉ!',
+            om: ' LAKKOOFSOTA TASGABBII ITOOPHIYAA:\n\n• Ambulaansii: 907\n• Poolisii: 991\n• Abidda: 939\n• Adii Dhiiga: 011-552-72-22\n\n HOSPITAALOTA GUGUDDAA:\n• Black Lion (Finfinne): 011-551-1211\n• St. Paul (Finfinne): 011-275-1111\n\n⚠️ Tasgabbii hatattamaaf, amma 907 bilbili!'
         };
     }
     // ===== GREETING =====
     else if (lower.includes('hello') || lower.includes('hi') || lower.includes('ሰላም') || lower.includes('akkam') || lower.includes('selam')) {
         response = {
-            en: '👋 Hello! I am your Grok AI Health Assistant.\n\nI can help you with:\n🩺 Blood pressure & health analysis\n🦟 Malaria information\n🍬 Diabetes management\n🌿 Ethiopian traditional medicine\n🥗 Diet & nutrition advice\n🚨 Emergency information\n\nJust type your health question!',
-            am: '👋 ሰላም! እኔ የእርስዎ Grok AI የጤና ረዳት ነኝ።\n\nእንዲህ ልረዳዎ እችላለሁ:\n🩺 የደም ግፊት እና የጤና ትንተና\n🦟 የወባ መረጃ\n🍬 የስኳር አያያዝ\n🌿 የኢትዮጵያ ባህላዊ ሕክምና\n🥗 የአመጋገብ ምክር\n🚨 የአደጋ ጊዜ መረጃ\n\nየጤና ጥያቄዎን ብቻ ይጻፉ!',
-            om: '👋 Akkam! Ani gargaaraa fayyaa Grok AI keeti.\n\nWaanan si gargaaruu danda\'u:\n🩺 Dhiibbaa dhiigaa fi xiinxala fayyaa\n🦟 Odeeffannoo busaa\n🍬 To\'annaa sukkaara\n🌿 Qoricha aadaa Itoophiyaa\n🥗 Gorsa nyaataa\n🚨 Odeeffannoo tasgabbii\n\nGaaffii fayyaa kee barreessi!'
+            en: ' Hello! I am your Grok AI Health Assistant.\n\nI can help you with:\n Blood pressure & health analysis\n Malaria information\n Diabetes management\n Ethiopian traditional medicine\n Diet & nutrition advice\n🚨 Emergency information\n\nJust type your health question!',
+            am: ' ሰላም! እኔ የእርስዎ Grok AI የጤና ረዳት ነኝ።\n\nእንዲህ ልረዳዎ እችላለሁ:\n የደም ግፊት እና የጤና ትንተና\n የወባ መረጃ\n የስኳር አያያዝ\n የኢትዮጵያ ባህላዊ ሕክምና\n የአመጋገብ ምክር\n የአደጋ ጊዜ መረጃ\n\nየጤና ጥያቄዎን ብቻ ይጻፉ!',
+            om: ' Akkam! Ani gargaaraa fayyaa Grok AI keeti.\n\nWaanan si gargaaruu danda\'u:\n Dhiibbaa dhiigaa fi xiinxala fayyaa\n Odeeffannoo busaa\n To\'annaa sukkaara\n Qoricha aadaa Itoophiyaa\n Gorsa nyaataa\n🚨 Odeeffannoo tasgabbii\n\nGaaffii fayyaa kee barreessi!'
         };
     }
     // ===== DEFAULT =====
     else {
         response = {
-            en: '🤔 I understand your question. Here are topics I can help with:\n\n• "I have a headache" - Headache advice\n• "Tell me about malaria" - Malaria info\n• "Blood pressure tips" - BP management\n• "Diabetes diet" - Diabetes nutrition\n• "Traditional herbs" - Ethiopian medicine\n• "Emergency numbers" - Emergency info\n• "Healthy Ethiopian food" - Diet advice\n\nWhat would you like to know?',
-            am: '🤔 ጥያቄዎን ተረድቻለሁ። ልረዳዎ የምችልባቸው ርዕሶች:\n\n• "ራስ ምታት አለብኝ" - የራስ ምታት ምክር\n• "ስለ ወባ ንገረኝ" - የወባ መረጃ\n• "የደም ግፊት ምክሮች" - የደም ግፊት አያያዝ\n• "የስኳር አመጋገብ" - የስኳር አመጋገብ\n• "ባህላዊ እፅዋት" - የኢትዮጵያ ሕክምና\n• "የአደጋ ጊዜ ቁጥሮች" - የአደጋ ጊዜ መረጃ\n\nምን ማወቅ ይፈልጋሉ?',
-            om: '🤔 Gaaffii kee nan hubadha. Mata dureewwan ani si gargaaruu danda\'u:\n\n• "Mataa bowwuu qaba" - Gorsa mataa bowwuu\n• "Waa\'ee busaa natti himi" - Odeeffannoo busaa\n• "Gorsa dhiibbaa dhiigaa" - To\'annaa dhiibbaa dhiigaa\n• "Nyaata sukkaara" - Nyaata sukkaara\n• "Margoota aadaa" - Qoricha Itoophiyaa\n• "Lakk. tasgabbii" - Odeeffannoo tasgabbii\n\nMaal barbaaddu?'
+            en: ' I understand your question. Here are topics I can help with:\n\n• "I have a headache" - Headache advice\n• "Tell me about malaria" - Malaria info\n• "Blood pressure tips" - BP management\n• "Diabetes diet" - Diabetes nutrition\n• "Traditional herbs" - Ethiopian medicine\n• "Emergency numbers" - Emergency info\n• "Healthy Ethiopian food" - Diet advice\n\nWhat would you like to know?',
+            am: ' ጥያቄዎን ተረድቻለሁ። ልረዳዎ የምችልባቸው ርዕሶች:\n\n• "ራስ ምታት አለብኝ" - የራስ ምታት ምክር\n• "ስለ ወባ ንገረኝ" - የወባ መረጃ\n• "የደም ግፊት ምክሮች" - የደም ግፊት አያያዝ\n• "የስኳር አመጋገብ" - የስኳር አመጋገብ\n• "ባህላዊ እፅዋት" - የኢትዮጵያ ሕክምና\n• "የአደጋ ጊዜ ቁጥሮች" - የአደጋ ጊዜ መረጃ\n\nምን ማወቅ ይፈልጋሉ?',
+            om: ' Gaaffii kee nan hubadha. Mata dureewwan ani si gargaaruu danda\'u:\n\n• "Mataa bowwuu qaba" - Gorsa mataa bowwuu\n• "Waa\'ee busaa natti himi" - Odeeffannoo busaa\n• "Gorsa dhiibbaa dhiigaa" - To\'annaa dhiibbaa dhiigaa\n• "Nyaata sukkaara" - Nyaata sukkaara\n• "Margoota aadaa" - Qoricha Itoophiyaa\n• "Lakk. tasgabbii" - Odeeffannoo tasgabbii\n\nMaal barbaaddu?'
         };
     }
 
@@ -165,9 +153,7 @@ app.post('/api/v1/chat', (req, res) => {
     });
 });
 
-// ============================================
 // FEATURE 2: SYMPTOM-TO-DISEASE AI DIAGNOSIS
-// ============================================
 app.post('/api/v1/symptoms/analyze', (req, res) => {
     const { symptoms, duration, severity } = req.body;
 
@@ -182,7 +168,6 @@ app.post('/api/v1/symptoms/analyze', (req, res) => {
     const sympStr = symptoms.join(' ').toLowerCase();
     const sev = severity || 5;
 
-    // ===== MALARIA =====
     if ((sympStr.includes('fever') || sympStr.includes('chills')) &&
         (sympStr.includes('headache') || sympStr.includes('muscle') || sympStr.includes('fatigue'))) {
         findings.push({
@@ -327,9 +312,7 @@ app.post('/api/v1/symptoms/analyze', (req, res) => {
     });
 });
 
-// ============================================
 // FEATURE 3: HERB-DRUG INTERACTION CHECKER
-// ============================================
 app.post('/api/v1/herbs/check-interactions', (req, res) => {
     const { herbId, medications } = req.body;
 
