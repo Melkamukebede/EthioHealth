@@ -221,7 +221,11 @@ For endpoint **#5** (`/api/v1/auth/me`), include the token in the header:
   "severity": 7,
   "duration": "1day"
 }
-
+---11
+{
+  "message": "I have a headache",
+  "language": "en"
+}
 ##  Installation
 
 ### Prerequisites
