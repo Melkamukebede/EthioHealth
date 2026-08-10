@@ -175,33 +175,29 @@ Ethiopia faces unique healthcare challenges:
 | POST | `/api/v1/voice/process` | Process voice commands |
 
 ---
-## 🧪 Test API Endpoints
+## 📡 ALL API ENDPOINTS QUICK REFERENCE
 
-Click any link below to test the API directly in your browser using Reqbin:
+| # | Method | Full URL | Purpose | Auth |
+|---|--------|----------|---------|------|
+| 1 | `GET` | `https://ethiohalth-api.onrender.com/` | API Home Status | No |
+| 2 | `GET` | `https://ethiohalth-api.onrender.com/api/health` | Server Health Check | No |
+| 3 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/auth/register` | Create New Account | No |
+| 4 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/auth/login` | User Login | No |
+| 5 | `GET` | `https://ethiohalth-api.onrender.com/api/v1/auth/me` | Get User Profile | Yes |
+| 6 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/health/analyze` | Analyze Vital Signs | No |
+| 7 | `GET` | `https://ethiohalth-api.onrender.com/api/v1/health/trends` | Get Health History | No |
+| 8 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/symptoms/analyze` | AI Symptom Diagnosis | No |
+| 9 | `GET` | `https://ethiohalth-api.onrender.com/api/v1/herbs` | Get All Medicinal Herbs | No |
+| 10 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/herbs/check-interactions` | Check Herb-Drug Interactions | No |
+| 11 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/chat` | Grok AI Health Chat | No |
+| 12 | `POST` | `https://ethiohalth-api.onrender.com/api/v1/voice/process` | Process Voice Commands | No |
 
-### Quick Tests (GET Requests - Just Click)
-
-| Endpoint | Test Link |
-|----------|-----------|
-| Home Status | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com) |
-| Health Check | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com/api/health) |
-| Get All Herbs | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com/api/v1/herbs) |
-
-### Authentication (POST Requests)
-
-| Endpoint | Test Link |
-|----------|-----------|
-| Register User | [Test in Reqbin](https://reqbin.com/req/post/ethiohalth-api.onrender.com/api/v1/auth/register) |
-| Login User | [Test in Reqbin](https://reqbin.com/req/post/ethiohalth-api.onrender.com/api/v1/auth/login) |
-
-**Register Body:**
-```json
-{
-  "name": "Test User",
-  "email": "test@example.com",
-  "password": "123456"
-}
 ---
+
+### 🔐 Authentication Required
+
+For endpoint **#5** (`/api/v1/auth/me`), include the token in the header:
+
 ##  Installation
 
 ### Prerequisites
