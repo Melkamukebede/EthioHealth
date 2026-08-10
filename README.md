@@ -175,7 +175,33 @@ Ethiopia faces unique healthcare challenges:
 | POST | `/api/v1/voice/process` | Process voice commands |
 
 ---
+## 🧪 Test API Endpoints
 
+Click any link below to test the API directly in your browser using Reqbin:
+
+### Quick Tests (GET Requests - Just Click)
+
+| Endpoint | Test Link |
+|----------|-----------|
+| Home Status | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com) |
+| Health Check | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com/api/health) |
+| Get All Herbs | [Test in Reqbin](https://reqbin.com/req/get/ethiohalth-api.onrender.com/api/v1/herbs) |
+
+### Authentication (POST Requests)
+
+| Endpoint | Test Link |
+|----------|-----------|
+| Register User | [Test in Reqbin](https://reqbin.com/req/post/ethiohalth-api.onrender.com/api/v1/auth/register) |
+| Login User | [Test in Reqbin](https://reqbin.com/req/post/ethiohalth-api.onrender.com/api/v1/auth/login) |
+
+**Register Body:**
+```json
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "123456"
+}
+---
 ##  Installation
 
 ### Prerequisites
