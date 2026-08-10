@@ -215,6 +215,12 @@ For endpoint **#5** (`/api/v1/auth/me`), include the token in the header:
   "temperature": 37.2,
   "age": 45
 }
+---8
+{
+  "symptoms": ["fever", "chills", "headache", "muscle_pain"],
+  "severity": 7,
+  "duration": "1day"
+}
 
 ##  Installation
 
