@@ -203,7 +203,7 @@ For endpoint **#5** (`/api/v1/auth/me`), include the token in the header:
 ### 📥 Request Body Examples
 
 **Health Analysis (#6):**
-json
+---json
 {
   "systolic": 145,
   "diastolic": 90,
