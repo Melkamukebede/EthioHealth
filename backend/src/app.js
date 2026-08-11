@@ -724,7 +724,245 @@ app.post('/api/v1/auth/register', async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 });
+// ============================================
+// OpenFDA DRUG DATABASE INTEGRATION
+// ============================================
 
+// Search OpenFDA for drug information
+app.get('/api/v1/fda/drugs', async (req, res) => {
+    try {
+        const { name, limit } = req.query;
+        
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Drug name is required. Example: /api/v1/fda/drugs?name=metformin'
+            });
+        }
+        
+        const searchName = encodeURIComponent(name);
+        const resultLimit = limit || 5;
+        
+        // OpenFDA API endpoints
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:${searchName}+OR+openfda.generic_name:${searchName}&limit=${resultLimit}`;
+        
+        console.log('🔍 Searching OpenFDA for:', name);
+        
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'EthioHealthAI/2.0'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`OpenFDA returned ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Format the results
+        const formattedResults = (data.results || []).map(drug => ({
+            brandName: drug.openfda?.brand_name?.[0] || 'Unknown',
+            genericName: drug.openfda?.generic_name?.[0] || 'Unknown',
+            manufacturer: drug.openfda?.manufacturer_name?.[0] || 'Unknown',
+            indications: drug.indications_and_usage?.[0]?.substring(0, 500) || 'Not specified',
+            warnings: drug.warnings?.[0]?.substring(0, 500) || 'None listed',
+            adverseReactions: drug.adverse_reactions?.[0]?.substring(0, 300) || 'None listed',
+            dosage: drug.dosage_and_administration?.[0]?.substring(0, 300) || 'Consult physician',
+            activeIngredients: drug.active_ingredient || [],
+            purpose: drug.purpose?.[0] || 'Not specified',
+            route: drug.openfda?.route?.[0] || 'Not specified',
+            source: 'U.S. FDA (OpenFDA)',
+            lastUpdated: new Date().toISOString()
+        }));
+        
+        res.json({
+            success: true,
+            data: {
+                query: name,
+                totalResults: data.meta?.results?.total || 0,
+                returnedResults: formattedResults.length,
+                drugs: formattedResults
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ OpenFDA Error:', error.message);
+        
+        // Return local data as fallback
+        res.json({
+            success: false,
+            message: 'OpenFDA temporarily unavailable. Using local database.',
+            data: {
+                drugs: getLocalDrugData(req.query.name)
+            }
+        });
+    }
+});
+
+// Search OpenFDA for adverse events
+app.get('/api/v1/fda/adverse-events', async (req, res) => {
+    try {
+        const { drug, limit } = req.query;
+        
+        if (!drug) {
+            return res.status(400).json({
+                success: false,
+                message: 'Drug name is required'
+            });
+        }
+        
+        const searchName = encodeURIComponent(drug);
+        const resultLimit = limit || 10;
+        
+        const apiUrl = `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:${searchName}&limit=${resultLimit}`;
+        
+        console.log('🔍 Searching FDA adverse events for:', drug);
+        
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'EthioHealthAI/2.0'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`OpenFDA returned ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        const formattedResults = (data.results || []).map(event => ({
+            drugName: event.patient?.drug?.[0]?.medicinalproduct || 'Unknown',
+            reactions: event.patient?.reaction?.map(r => r.reactionmeddrapt) || [],
+            seriousness: event.seriousness || 'Unknown',
+            date: event.receiptdate || 'Unknown',
+            country: event.occurcountry || 'Unknown'
+        }));
+        
+        res.json({
+            success: true,
+            data: {
+                query: drug,
+                totalEvents: data.meta?.results?.total || 0,
+                events: formattedResults
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ OpenFDA Error:', error.message);
+        res.json({
+            success: false,
+            message: 'FDA adverse events data temporarily unavailable'
+        });
+    }
+});
+
+// Get drug recall information
+app.get('/api/v1/fda/recalls', async (req, res) => {
+    try {
+        const { drug, limit } = req.query;
+        const resultLimit = limit || 5;
+        
+        let apiUrl;
+        if (drug) {
+            const searchName = encodeURIComponent(drug);
+            apiUrl = `https://api.fda.gov/drug/enforcement.json?search=product_description:${searchName}&limit=${resultLimit}`;
+        } else {
+            apiUrl = `https://api.fda.gov/drug/enforcement.json?limit=${resultLimit}`;
+        }
+        
+        console.log('🔍 Searching FDA recalls');
+        
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'EthioHealthAI/2.0'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`OpenFDA returned ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        const formattedResults = (data.results || []).map(recall => ({
+            product: recall.product_description || 'Unknown',
+            reason: recall.reason_for_recall || 'Not specified',
+            recallingFirm: recall.recalling_firm || 'Unknown',
+            status: recall.status || 'Unknown',
+            classification: recall.classification || 'Unknown',
+            date: recall.recall_initiation_date || 'Unknown',
+            distribution: recall.distribution_pattern || 'Unknown'
+        }));
+        
+        res.json({
+            success: true,
+            data: {
+                query: drug || 'All',
+                totalRecalls: data.meta?.results?.total || 0,
+                recalls: formattedResults
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ OpenFDA Error:', error.message);
+        res.json({
+            success: false,
+            message: 'FDA recall data temporarily unavailable'
+        });
+    }
+});
+
+// Local drug database (fallback)
+function getLocalDrugData(name) {
+    const localDrugs = {
+        metformin: {
+            brandName: 'Glucophage',
+            genericName: 'Metformin',
+            manufacturer: 'Various',
+            indications: 'First-line medication for type 2 diabetes. Controls high blood sugar.',
+            warnings: 'Lactic acidosis risk. Monitor kidney function. Stop before surgery.',
+            adverseReactions: 'Nausea, vomiting, diarrhea, stomach pain, metallic taste',
+            dosage: '500mg twice daily or 850mg once daily with meals',
+            source: 'Local Database'
+        },
+        enalapril: {
+            brandName: 'Vasotec',
+            genericName: 'Enalapril',
+            manufacturer: 'Various',
+            indications: 'Treatment of hypertension and heart failure.',
+            warnings: 'Can cause fetal harm in pregnancy. Monitor potassium levels.',
+            adverseReactions: 'Dry cough, dizziness, headache, fatigue',
+            dosage: '5-40mg daily in 1-2 divided doses',
+            source: 'Local Database'
+        },
+        amlodipine: {
+            brandName: 'Norvasc',
+            genericName: 'Amlodipine',
+            manufacturer: 'Various',
+            indications: 'Treatment of hypertension and coronary artery disease.',
+            warnings: 'May cause peripheral edema. Use caution in liver disease.',
+            adverseReactions: 'Swelling, dizziness, flushing, palpitations',
+            dosage: '5-10mg once daily',
+            source: 'Local Database'
+        }
+    };
+    
+    return [localDrugs[name?.toLowerCase()] || {
+        brandName: 'Unknown',
+        genericName: name || 'Unknown',
+        manufacturer: 'Check with pharmacy',
+        indications: 'Consult healthcare provider',
+        warnings: 'Consult healthcare provider',
+        source: 'Local Database (Drug not found)'
+    }];
+}
 // Login
 app.post('/api/v1/auth/login', async (req, res) => {
     try {
