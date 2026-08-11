@@ -201,6 +201,64 @@
 <!-- ============================================
      OPENFDA DRUG SEARCH SECTION
      ============================================ -->
+        // This creates a new API route that listens for GET requests
+// Example: https://yourapi.com/api/v1/fda/drugs?name=metformin
+app.get('/api/v1/fda/drugs', async (req, res) => {
+    try {
+        // Gets the drug name from URL parameter (?name=metformin)
+        const { name, limit } = req.query;
+        
+        // If no drug name provided, return error
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Drug name is required'
+            });
+        }
+        
+        // Encodes the drug name for URL (spaces become %20)
+        const searchName = encodeURIComponent(name);
+        // How many results to return (default 5)
+        const resultLimit = limit || 5;
+        
+        // OpenFDA URL - searches both brand and generic names
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:${searchName}+OR+openfda.generic_name:${searchName}&limit=${resultLimit}`;
+        
+        // Call the FDA API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        // Format the raw FDA data into clean, usable format
+        const formattedResults = (data.results || []).map(drug => ({
+            brandName: drug.openfda?.brand_name?.[0] || 'Unknown',
+            genericName: drug.openfda?.generic_name?.[0] || 'Unknown',
+            manufacturer: drug.openfda?.manufacturer_name?.[0] || 'Unknown',
+            indications: drug.indications_and_usage?.[0]?.substring(0, 500) || 'Not specified',
+            warnings: drug.warnings?.[0]?.substring(0, 500) || 'None listed',
+            adverseReactions: drug.adverse_reactions?.[0]?.substring(0, 300) || 'None listed',
+            dosage: drug.dosage_and_administration?.[0]?.substring(0, 300) || 'Consult physician',
+            source: 'U.S. FDA (OpenFDA)'
+        }));
+        
+        // Send formatted results back to user
+        res.json({
+            success: true,
+            data: {
+                query: name,
+                totalResults: data.meta?.results?.total || 0,
+                drugs: formattedResults
+            }
+        });
+        
+    } catch (error) {
+        // If FDA API fails, return local database instead
+        res.json({
+            success: false,
+            message: 'OpenFDA unavailable. Using local database.',
+            data: { drugs: getLocalDrugData(req.query.name) }
+        });
+    }
+});
         <!-- HERBS -->
         <div id="section-herbs" class="section-content" style="display:none;">
             <div class="amz-card">
