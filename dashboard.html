@@ -103,6 +103,8 @@
         <button class="active" onclick="switchSection('home')"><i class="fas fa-home me-1"></i>Health Check</button>
         <button onclick="switchSection('symptoms')"><i class="fas fa-stethoscope me-1"></i>Symptoms</button>
         <button onclick="switchSection('herbs')"><i class="fas fa-leaf me-1"></i>Traditional Herbs</button>
+        <button onclick="switchSection('drugs')">
+         <i class="fas fa-pills me-1"></i>Drug Search</button>
         <button onclick="switchSection('chat')"><i class="fas fa-robot me-1"></i>AI Chat</button>
         <button onclick="switchSection('about')"><i class="fas fa-info-circle me-1"></i>About</button>
     </nav>
@@ -666,7 +668,157 @@ app.get('/api/v1/fda/drugs', async (req, res) => {
                 showToast('Local analysis used', 'warning');
             });
         }
+        // ============================================
+// OPENFDA DRUG SEARCH FUNCTIONS
+// ============================================
+
+/**
+ * Search FDA drug database
+ * This function calls your backend which then calls OpenFDA
+ */
+async function searchDrug() {
+    const input = document.getElementById('drugSearchInput');
+    const drugName = input.value.trim();
+    
+    if (!drugName) {
+        showToast('Please enter a drug name', 'warning');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('drugResults').style.display = 'none';
+    document.getElementById('drugLoading').style.display = 'block';
+    document.getElementById('drugError').style.display = 'none';
+    
+    console.log('🔍 Searching FDA for:', drugName);
+    
+    try {
+        // Call your backend API
+        const response = await fetch(`${API_URL}/fda/drugs?name=${encodeURIComponent(drugName)}`);
+        const data = await response.json();
         
+        // Hide loading
+        document.getElementById('drugLoading').style.display = 'none';
+        document.getElementById('drugResults').style.display = 'block';
+        
+        if (data.success && data.data.drugs.length > 0) {
+            // Show FDA results
+            renderDrugResults(data.data.drugs, 'fda');
+            showToast(`✅ Found ${data.data.totalResults} results from FDA`, 'success');
+        } else if (!data.success && data.data.drugs.length > 0) {
+            // Show local fallback results
+            document.getElementById('drugError').style.display = 'block';
+            renderDrugResults(data.data.drugs, 'local');
+            showToast('⚠️ Showing local database results', 'warning');
+        } else {
+            // No results
+            document.getElementById('drugResults').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>No results found for "${drugName}"</p>
+                    <small>Try a different spelling or check the generic name</small>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('❌ Drug search error:', error);
+        document.getElementById('drugLoading').style.display = 'none';
+        document.getElementById('drugResults').style.display = 'block';
+        document.getElementById('drugResults').innerHTML = `
+            <div class="drug-warning-box">
+                <h4><i class="fas fa-exclamation-circle me-2"></i>Search Failed</h4>
+                <p>Could not connect to the drug database. Please check your internet connection and try again.</p>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Quick search - when user clicks a tag
+ */
+function quickDrugSearch(drugName) {
+    document.getElementById('drugSearchInput').value = drugName;
+    searchDrug();
+}
+
+/**
+ * Render drug results in the UI
+ */
+function renderDrugResults(drugs, source) {
+    const container = document.getElementById('drugResults');
+    
+    const badgeClass = source === 'fda' ? 'badge-fda' : 'badge-local';
+    const badgeText = source === 'fda' ? 'FDA Verified' : 'Local Database';
+    
+    let html = '';
+    
+    drugs.forEach(drug => {
+        html += `
+            <div class="drug-result-card">
+                <div class="drug-header">
+                    <div>
+                        <div class="drug-name">${drug.brandName}</div>
+                        <div class="drug-generic">${drug.genericName}</div>
+                    </div>
+                    <span class="drug-badge ${badgeClass}">${badgeText}</span>
+                </div>
+                
+                ${drug.manufacturer ? `
+                    <div class="drug-info-row">
+                        <span class="drug-info-tag">
+                            <i class="fas fa-industry me-1"></i>${drug.manufacturer}
+                        </span>
+                        ${drug.route ? `
+                            <span class="drug-info-tag">
+                                <i class="fas fa-syringe me-1"></i>${drug.route}
+                            </span>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                
+                ${drug.indications ? `
+                    <div class="drug-section">
+                        <h4><i class="fas fa-check-circle text-success me-1"></i>Uses</h4>
+                        <p>${drug.indications}</p>
+                    </div>
+                ` : ''}
+                
+                ${drug.dosage ? `
+                    <div class="drug-section">
+                        <h4><i class="fas fa-clock text-primary me-1"></i>Dosage</h4>
+                        <p>${drug.dosage}</p>
+                    </div>
+                ` : ''}
+                
+                ${drug.warnings ? `
+                    <div class="drug-warning-box">
+                        <h4><i class="fas fa-exclamation-triangle me-1"></i>Warnings</h4>
+                        <p style="color:#991b1b;">${drug.warnings}</p>
+                    </div>
+                ` : ''}
+                
+                ${drug.adverseReactions ? `
+                    <div class="drug-section">
+                        <h4><i class="fas fa-exclamation-circle text-warning me-1"></i>Side Effects</h4>
+                        <p>${drug.adverseReactions}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="drug-section">
+                    <small class="text-muted">
+                        <i class="fas fa-database me-1"></i>
+                        Source: ${drug.source || 'FDA Database'}
+                    </small>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+console.log('✅ OpenFDA drug search functions loaded');
         // ============ HERBS ============
         function loadHerbs() {
             console.log(' Loading herbs...');
