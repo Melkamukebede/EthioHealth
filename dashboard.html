@@ -865,6 +865,30 @@ async function checkDrugInteractions() {
 }
 
 console.log('✅ Drug interaction checker loaded');
+
+        <!-- Drug Interaction Checker -->
+<div id="section-interactions" class="section-content" style="display:none;">
+    <div class="drug-search-container">
+        <div class="drug-search-box">
+            <h4 style="margin-bottom:15px;">
+                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                Drug Interaction Checker
+            </h4>
+            <p class="small text-muted mb-3">
+                Check if two medications are safe to take together.
+            </p>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="text" id="interactionDrug1" class="form-control" placeholder="First drug name...">
+                <span style="align-self:center;font-weight:bold;">+</span>
+                <input type="text" id="interactionDrug2" class="form-control" placeholder="Second drug name...">
+            </div>
+            <button class="btn btn-warning w-100" onclick="checkDrugInteractions()">
+                <i class="fas fa-check-circle me-2"></i>Check Interactions
+            </button>
+        </div>
+        <div id="interactionResults"></div>
+    </div>
+</div>
         // ============ HERBS ============
         function loadHerbs() {
             console.log(' Loading herbs...');
