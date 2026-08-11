@@ -392,3 +392,13 @@ body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+}
+
+.empty-state i {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
