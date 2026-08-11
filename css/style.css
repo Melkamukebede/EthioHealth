@@ -271,3 +271,19 @@ body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 
     font-size: 15px;
     transition: border-color 0.3s;
 }
+.drug-search-box input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+}
+
+.drug-search-box button {
+    padding: 12px 24px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
