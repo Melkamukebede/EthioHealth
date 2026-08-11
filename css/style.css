@@ -258,3 +258,16 @@ body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
+.drug-search-box .search-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.drug-search-box input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 25px;
+    font-size: 15px;
+    transition: border-color 0.3s;
+}
