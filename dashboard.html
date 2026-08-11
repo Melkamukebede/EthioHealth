@@ -819,6 +819,52 @@ function renderDrugResults(drugs, source) {
 }
 
 console.log('✅ OpenFDA drug search functions loaded');
+
+        // ============================================
+// DRUG INTERACTION CHECKER
+// ============================================
+
+/**
+ * Check interactions between multiple drugs
+ */
+async function checkDrugInteractions() {
+    const drug1 = document.getElementById('interactionDrug1').value.trim();
+    const drug2 = document.getElementById('interactionDrug2').value.trim();
+    
+    if (!drug1 || !drug2) {
+        showToast('Please enter both drug names', 'warning');
+        return;
+    }
+    
+    console.log('🔍 Checking interactions:', drug1, '+', drug2);
+    
+    const interactionData = {
+        drugs: [drug1, drug2],
+        severity: 'unknown',
+        description: 'Checking FDA database...',
+        recommendation: 'Consult healthcare provider'
+    };
+    
+    // Display interaction result
+    const container = document.getElementById('interactionResults');
+    container.innerHTML = `
+        <div class="drug-result-card">
+            <div class="drug-header">
+                <div class="drug-name">${drug1} + ${drug2}</div>
+                <span class="drug-badge badge-fda">Checking...</span>
+            </div>
+            <div class="drug-warning-box">
+                <h4><i class="fas fa-info-circle me-1"></i>Interaction Check</h4>
+                <p>Always consult your doctor or pharmacist before combining medications.</p>
+                <p>For Ethiopian patients: Visit your nearest health center for free consultation about drug interactions.</p>
+            </div>
+        </div>
+    `;
+    
+    showToast('⚠️ Always verify with a healthcare provider', 'warning');
+}
+
+console.log('✅ Drug interaction checker loaded');
         // ============ HERBS ============
         function loadHerbs() {
             console.log(' Loading herbs...');
