@@ -287,3 +287,21 @@ body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 
     cursor: pointer;
     transition: background 0.3s;
 }
+.drug-search-box button:hover {
+    background: #059669;
+}
+
+.drug-result-card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s;
+}
+
+.drug-result-card:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
