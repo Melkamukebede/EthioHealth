@@ -305,3 +305,21 @@ body.rtl .ms-1, body.rtl .ms-2 { margin-right: 0.25rem !important; margin-left: 
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transform: translateY(-2px);
 }
+.drug-result-card .drug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 10px;
+}
+
+.drug-result-card .drug-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #111827;
+}
+
+.drug-result-card .drug-generic {
+    font-size: 13px;
+    color: #8b5cf6;
+    font-style: italic;
+}
