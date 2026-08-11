@@ -203,68 +203,30 @@
                     </div>
                 </div>
             </div>
+        </div>  <!-- Drug Interaction Checker -->
+<div id="section-interactions" class="section-content" style="display:none;">
+    <div class="drug-search-container">
+        <div class="drug-search-box">
+            <h4 style="margin-bottom:15px;">
+                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                Drug Interaction Checker
+            </h4>
+            <p class="small text-muted mb-3">
+                Check if two medications are safe to take together.
+            </p>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="text" id="interactionDrug1" class="form-control" placeholder="First drug name...">
+                <span style="align-self:center;font-weight:bold;">+</span>
+                <input type="text" id="interactionDrug2" class="form-control" placeholder="Second drug name...">
+            </div>
+            <button class="btn btn-warning w-100" onclick="checkDrugInteractions()">
+                <i class="fas fa-check-circle me-2"></i>Check Interactions
+            </button>
         </div>
-<!-- ============================================
-     OPENFDA DRUG SEARCH SECTION
-     ============================================ -->
-        // This creates a new API route that listens for GET requests
-// Example: https://yourapi.com/api/v1/fda/drugs?name=metformin
-app.get('/api/v1/fda/drugs', async (req, res) => {
-    try {
-        // Gets the drug name from URL parameter (?name=metformin)
-        const { name, limit } = req.query;
-        
-        // If no drug name provided, return error
-        if (!name) {
-            return res.status(400).json({
-                success: false,
-                message: 'Drug name is required'
-            });
-        }
-        
-        // Encodes the drug name for URL (spaces become %20)
-        const searchName = encodeURIComponent(name);
-        // How many results to return (default 5)
-        const resultLimit = limit || 5;
-        
-        // OpenFDA URL - searches both brand and generic names
-        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:${searchName}+OR+openfda.generic_name:${searchName}&limit=${resultLimit}`;
-        
-        // Call the FDA API
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        
-        // Format the raw FDA data into clean, usable format
-        const formattedResults = (data.results || []).map(drug => ({
-            brandName: drug.openfda?.brand_name?.[0] || 'Unknown',
-            genericName: drug.openfda?.generic_name?.[0] || 'Unknown',
-            manufacturer: drug.openfda?.manufacturer_name?.[0] || 'Unknown',
-            indications: drug.indications_and_usage?.[0]?.substring(0, 500) || 'Not specified',
-            warnings: drug.warnings?.[0]?.substring(0, 500) || 'None listed',
-            adverseReactions: drug.adverse_reactions?.[0]?.substring(0, 300) || 'None listed',
-            dosage: drug.dosage_and_administration?.[0]?.substring(0, 300) || 'Consult physician',
-            source: 'U.S. FDA (OpenFDA)'
-        }));
-        
-        // Send formatted results back to user
-        res.json({
-            success: true,
-            data: {
-                query: name,
-                totalResults: data.meta?.results?.total || 0,
-                drugs: formattedResults
-            }
-        });
-        
-    } catch (error) {
-        // If FDA API fails, return local database instead
-        res.json({
-            success: false,
-            message: 'OpenFDA unavailable. Using local database.',
-            data: { drugs: getLocalDrugData(req.query.name) }
-        });
-    }
-});
+        <div id="interactionResults"></div>
+    </div>
+</div>
+
         <!-- HERBS -->
         <div id="section-herbs" class="section-content" style="display:none;">
             <div class="amz-card">
@@ -870,29 +832,67 @@ async function checkDrugInteractions() {
 
 console.log('✅ Drug interaction checker loaded');
 
-        <!-- Drug Interaction Checker -->
-<div id="section-interactions" class="section-content" style="display:none;">
-    <div class="drug-search-container">
-        <div class="drug-search-box">
-            <h4 style="margin-bottom:15px;">
-                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                Drug Interaction Checker
-            </h4>
-            <p class="small text-muted mb-3">
-                Check if two medications are safe to take together.
-            </p>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input type="text" id="interactionDrug1" class="form-control" placeholder="First drug name...">
-                <span style="align-self:center;font-weight:bold;">+</span>
-                <input type="text" id="interactionDrug2" class="form-control" placeholder="Second drug name...">
-            </div>
-            <button class="btn btn-warning w-100" onclick="checkDrugInteractions()">
-                <i class="fas fa-check-circle me-2"></i>Check Interactions
-            </button>
-        </div>
-        <div id="interactionResults"></div>
-    </div>
-</div>
+   <!-- ============================================
+     OPENFDA DRUG SEARCH SECTION
+     ============================================ -->
+        // This creates a new API route that listens for GET requests
+// Example: https://yourapi.com/api/v1/fda/drugs?name=metformin
+app.get('/api/v1/fda/drugs', async (req, res) => {
+    try {
+        // Gets the drug name from URL parameter (?name=metformin)
+        const { name, limit } = req.query;
+        
+        // If no drug name provided, return error
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Drug name is required'
+            });
+        }
+        
+        // Encodes the drug name for URL (spaces become %20)
+        const searchName = encodeURIComponent(name);
+        // How many results to return (default 5)
+        const resultLimit = limit || 5;
+        
+        // OpenFDA URL - searches both brand and generic names
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:${searchName}+OR+openfda.generic_name:${searchName}&limit=${resultLimit}`;
+        
+        // Call the FDA API
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        // Format the raw FDA data into clean, usable format
+        const formattedResults = (data.results || []).map(drug => ({
+            brandName: drug.openfda?.brand_name?.[0] || 'Unknown',
+            genericName: drug.openfda?.generic_name?.[0] || 'Unknown',
+            manufacturer: drug.openfda?.manufacturer_name?.[0] || 'Unknown',
+            indications: drug.indications_and_usage?.[0]?.substring(0, 500) || 'Not specified',
+            warnings: drug.warnings?.[0]?.substring(0, 500) || 'None listed',
+            adverseReactions: drug.adverse_reactions?.[0]?.substring(0, 300) || 'None listed',
+            dosage: drug.dosage_and_administration?.[0]?.substring(0, 300) || 'Consult physician',
+            source: 'U.S. FDA (OpenFDA)'
+        }));
+        
+        // Send formatted results back to user
+        res.json({
+            success: true,
+            data: {
+                query: name,
+                totalResults: data.meta?.results?.total || 0,
+                drugs: formattedResults
+            }
+        });
+        
+    } catch (error) {
+        // If FDA API fails, return local database instead
+        res.json({
+            success: false,
+            message: 'OpenFDA unavailable. Using local database.',
+            data: { drugs: getLocalDrugData(req.query.name) }
+        });
+    }
+});   
         // ============ HERBS ============
         function loadHerbs() {
             console.log(' Loading herbs...');
