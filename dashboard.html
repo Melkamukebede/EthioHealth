@@ -447,8 +447,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 // ============================================================
 // FIX #1 — Corrected API URL (was "ethiohalth", missing 'e')
 // ============================================================
-const API_URL = 'https://ethiohealth-api.onrender.com/api/v1';
-
+const API_URL = 'https://ethiohalth-api.onrender.com/api/v1';
 let selectedSymptoms = [], healthChart = null, allHerbs = [];
 
 const SYMPTOM_MAP = {
@@ -704,7 +703,12 @@ function toggleSymptom(s, el) {
   }
   updateSelectedSymptomsList();
 }
-
+function removeSymptom(s) {
+  selectedSymptoms = selectedSymptoms.filter(function(x) { return x !== s; });
+  updateSelectedSymptomsList();
+  var active = document.querySelector('.body-part.active');
+  if (active) showBodyPartSymptoms(active.dataset.part);
+}
 function updateSelectedSymptomsList() {
   const el = document.getElementById('selectedSymptomsList');
   if (!selectedSymptoms.length) {
