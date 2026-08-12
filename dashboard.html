@@ -4,456 +4,907 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EthioHealth AI Pro - Advanced Dashboard</title>
-    
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Animate.css -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --amazon-dark: #131921; --amazon-nav: #232F3E;
-            --amazon-yellow: #FFD814; --amazon-orange: #FF9900;
-            --primary: #10b981; --primary-dark: #059669;
-            --eth-green: #078930; --eth-yellow: #FCDD09; --eth-red: #DA121A;
-            --bg-light: #EAEDED; --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            --card-hover: 0 8px 25px rgba(0,0,0,0.15);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-light); font-family: 'Segoe UI', Arial, sans-serif; padding-bottom: 80px; }
-        
-        /* Ethiopian Flag */
-        .flag-stripe { display: flex; height: 3px; position: sticky; top: 0; z-index: 1001; }
-        .flag-stripe div:nth-child(1) { flex: 1; background: var(--eth-green); }
-        .flag-stripe div:nth-child(2) { flex: 1; background: var(--eth-yellow); }
-        .flag-stripe div:nth-child(3) { flex: 1; background: var(--eth-red); }
-        
-        /* Header */
-        .amz-header { background: var(--amazon-dark); color: white; padding: 8px 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 3px; z-index: 1000; }
-        .amz-header .logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: var(--transition); }
-        .amz-header .logo:hover { transform: scale(1.02); }
-        .amz-header .logo i { color: var(--primary); font-size: 26px; animation: heartbeat 1.5s infinite; }
-        @keyframes heartbeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-        
-        .amz-header .nav-icons button { background: none; border: none; color: white; cursor: pointer; font-size: 13px; padding: 6px 10px; border-radius: 4px; transition: var(--transition); }
-        .amz-header .nav-icons button:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
-        
-        /* Category Nav */
-        .cat-nav { background: var(--amazon-nav); padding: 6px 15px; display: flex; gap: 5px; overflow-x: auto; position: sticky; top: 56px; z-index: 999; }
-        .cat-nav button { background: none; border: none; color: #ccc; padding: 8px 16px; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 13px; transition: var(--transition); }
-        .cat-nav button:hover { color: white; background: rgba(255,255,255,0.1); }
-        .cat-nav button.active { color: white; background: rgba(255,255,255,0.2); font-weight: bold; }
-        
-        /* Main Content */
-        .main-content { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        
-        /* Cards with Advanced Animations */
-        .amz-card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; box-shadow: var(--card-shadow); transition: var(--transition); position: relative; overflow: hidden; }
-        .amz-card:hover { box-shadow: var(--card-hover); transform: translateY(-3px); }
-        .amz-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--primary), transparent); transition: left 0.5s; }
-        .amz-card:hover::before { left: 100%; }
-        .card-title { font-weight: bold; font-size: 16px; color: #0F1111; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 8px; }
-        
-        /* Hero Banner */
-        .hero { background: linear-gradient(135deg, #059669, #10b981, #34d399); color: white; padding: 30px; border-radius: 12px; margin-bottom: 15px; position: relative; overflow: hidden; animation: gradient-shift 5s ease infinite; }
-        @keyframes gradient-shift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .hero::after { content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-30px,-20px); } }
-        
-        /* Vitals Grid */
-        .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .vitals-grid .input-group-animated { position: relative; }
-        .vitals-grid label { font-size: 11px; font-weight: 600; color: #565959; display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .vitals-grid input { width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: var(--transition); background: #fafafa; }
-        .vitals-grid input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(16,185,129,0.1); background: white; transform: scale(1.02); }
-        
-        /* Buttons */
-        .btn-yellow { background: var(--amazon-yellow); color: #0F1111; border: none; padding: 14px 24px; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; transition: var(--transition); position: relative; overflow: hidden; }
-        .btn-yellow:hover { background: #F7CA00; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,216,20,0.4); }
-        .btn-yellow:active { transform: scale(0.97); }
-        .btn-yellow::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%,-50%); transition: all 0.5s; }
-        .btn-yellow:active::after { width: 300px; height: 300px; }
-        
-        /* Risk Items */
-        .risk-item { padding: 14px 16px; margin-bottom: 8px; border-radius: 10px; border-left: 5px solid #ddd; background: white; transition: var(--transition); animation: slideInRight 0.5s ease; }
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-        .risk-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .risk-item.high { background: #fef2f2; border-left-color: #ef4444; }
-        .risk-item.medium { background: #fffbeb; border-left-color: #f59e0b; }
-        .risk-item.low { background: #f0fdf4; border-left-color: #10b981; }
-        .risk-bar { height: 6px; background: #e5e7eb; border-radius: 3px; margin-top: 6px; overflow: hidden; }
-        .risk-bar-fill { height: 100%; border-radius: 3px; transition: width 1.5s cubic-bezier(0.4,0,0.2,1); }
-        .risk-bar-fill.high { background: linear-gradient(90deg, #ef4444, #f87171); }
-        .risk-bar-fill.medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-        .risk-bar-fill.low { background: linear-gradient(90deg, #10b981, #34d399); }
-        
-        /* Score Ring */
-        .score-ring { width: 90px; height: 90px; border-radius: 50%; border: 6px solid var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 28px; font-weight: bold; transition: var(--transition); animation: pulse-ring 2s infinite; position: relative; }
-        @keyframes pulse-ring { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.3); } 50% { box-shadow: 0 0 0 20px transparent; } }
-        .score-ring.good { border-color: #10b981; color: #10b981; }
-        .score-ring.warning { border-color: #f59e0b; color: #f59e0b; }
-        .score-ring.danger { border-color: #ef4444; color: #ef4444; }
-        
-        /* Herb Cards */
-        .herb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .herb-card { background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px; cursor: pointer; transition: var(--transition); }
-        .herb-card:hover { border-color: var(--primary); box-shadow: var(--card-hover); transform: translateY(-3px) rotate(1deg); }
-        
-        /* Body Map */
-        .body-part-3d { position: absolute; background: rgba(16,185,129,0.12); border: 2px solid rgba(16,185,129,0.3); border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-        .body-part-3d:hover { background: rgba(16,185,129,0.4); border-color: var(--primary); transform: scale(1.15); z-index: 10; box-shadow: 0 0 20px rgba(16,185,129,0.3); }
-        .body-part-3d.selected { background: var(--primary); color: white; border-color: var(--primary-dark); animation: selected-pulse 0.5s ease; }
-        @keyframes selected-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        
-        /* Chat */
-        .chat-box { max-height: 350px; overflow-y: auto; padding: 12px; background: #f9fafb; border-radius: 10px; margin-bottom: 10px; }
-        .chat-msg { padding: 10px 14px; border-radius: 15px; margin-bottom: 8px; max-width: 80%; animation: fadeInUp 0.4s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .chat-user { background: var(--primary); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-        .chat-bot { background: #e5e7eb; color: #0F1111; border-bottom-left-radius: 4px; }
-        
-        /* Drug Search */
-        .drug-result-card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 10px; border: 1px solid #e5e7eb; transition: var(--transition); animation: fadeInUp 0.5s ease; }
-        .drug-result-card:hover { border-color: var(--primary); box-shadow: var(--card-hover); }
-        
-        /* SOS Button */
-        .sos-btn { position: fixed; bottom: 20px; right: 15px; width: 60px; height: 60px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(239,68,68,0.5); z-index: 1000; animation: pulse-sos 2s infinite; transition: var(--transition); }
-        .sos-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(239,68,68,0.7); }
-        @keyframes pulse-sos { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); } 50% { box-shadow: 0 0 0 20px transparent; } }
-        
-        /* Loading Overlay */
-        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
-        .loading-box { background: white; padding: 30px 40px; border-radius: 16px; text-align: center; animation: zoomIn 0.3s ease; }
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        /* Toast */
-        #toastContainer { position: fixed; top: 70px; right: 15px; z-index: 10000; }
-        .toast-msg { padding: 12px 20px; border-radius: 25px; margin-bottom: 8px; font-size: 13px; animation: slideInRight 0.4s ease; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        
-        /* Chart Container */
-        .chart-container { position: relative; height: 280px; width: 100%; margin-top: 10px; }
-        
-        @media (min-width: 768px) { .vitals-grid { grid-template-columns: 1fr 1fr 1fr; } .herb-grid { grid-template-columns: 1fr 1fr 1fr 1fr; } }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --eth-green:#078930;--eth-yellow:#FCDD09;--eth-red:#DA121A;
+  --primary:#0EB87F;--primary-dk:#0a9167;--primary-lt:#e6faf4;
+  --accent:#FF9900;
+  --bg:#F0F4F3;--surface:#fff;--surface-2:#F7FAFA;--border:#E2EAEA;
+  --text-1:#0D1F1A;--text-2:#3D5A54;--text-3:#7A9E97;
+  --nav-bg:#0D1F1A;--nav-sub:#162B25;
+  --shadow-sm:0 1px 4px rgba(14,184,127,.08);
+  --shadow-md:0 4px 20px rgba(14,184,127,.12);
+  --shadow-lg:0 12px 40px rgba(14,184,127,.18);
+  --ease:cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text-1);padding-bottom:100px;-webkit-font-smoothing:antialiased}
+
+/* FLAG */
+.flag-stripe{display:flex;height:4px;position:sticky;top:0;z-index:1002}
+.flag-stripe span:nth-child(1){flex:1;background:var(--eth-green)}
+.flag-stripe span:nth-child(2){flex:1;background:var(--eth-yellow)}
+.flag-stripe span:nth-child(3){flex:1;background:var(--eth-red)}
+
+/* HEADER */
+.app-header{background:var(--nav-bg);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:4px;z-index:1001;box-shadow:0 2px 16px rgba(0,0,0,.35)}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;color:inherit}
+.logo-icon{width:38px;height:38px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;animation:heartbeat 2s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(14,184,127,.4)}50%{transform:scale(1.12);box-shadow:0 0 0 12px rgba(14,184,127,0)}}
+.logo-text{font-weight:800;font-size:17px;letter-spacing:-.3px}
+.logo-text small{font-size:10px;font-weight:500;color:var(--primary);margin-left:4px}
+.header-actions{display:flex;gap:4px}
+.hdr-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#d4d4d4;padding:6px 12px;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .25s var(--ease);display:flex;align-items:center;gap:5px}
+.hdr-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)}
+.hdr-btn.danger:hover{background:rgba(220,38,38,.3);border-color:#ef4444;color:#fca5a5}
+
+/* CAT NAV */
+.cat-nav{background:var(--nav-sub);padding:0 16px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:62px;z-index:1000;scrollbar-width:none}
+.cat-nav::-webkit-scrollbar{display:none}
+.cat-btn{background:none;border:none;color:#8fb5ae;padding:11px 16px;border-radius:0;cursor:pointer;white-space:nowrap;font-size:12.5px;font-family:inherit;font-weight:600;transition:color .2s,border-color .2s;border-bottom:3px solid transparent;letter-spacing:.2px}
+.cat-btn:hover{color:#d4ede8}
+.cat-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* LAYOUT */
+.main-content{max-width:1180px;margin:0 auto;padding:20px 16px}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:box-shadow .3s var(--ease),transform .3s var(--ease);overflow:hidden}
+.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.card-inner{padding:20px}
+.section-title{font-size:14px;font-weight:700;color:var(--text-2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:var(--primary);font-size:16px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0a9167 0%,#0EB87F 50%,#34d399 100%);background-size:200% 200%;color:white;padding:28px 28px 32px;border-radius:16px;margin-bottom:18px;position:relative;overflow:hidden;animation:gradient-shift 6s ease infinite}
+@keyframes gradient-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero::before{content:'';position:absolute;width:280px;height:280px;background:rgba(255,255,255,.07);border-radius:50%;top:-80px;right:-80px;animation:float 8s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-15px)}}
+.hero-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;margin-bottom:12px;border:1px solid rgba(255,255,255,.2)}
+.hero h2{font-size:24px;font-weight:800;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.85}
+.hero-stats{display:flex;gap:12px;margin-top:20px;position:relative;z-index:1;flex-wrap:wrap}
+.hero-stat{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:10px;padding:10px 16px;border:1px solid rgba(255,255,255,.2);text-align:center;flex:1;min-width:60px}
+.hero-stat .val{font-size:22px;font-weight:800}
+.hero-stat .lbl{font-size:10px;opacity:.75;letter-spacing:.5px;text-transform:uppercase}
+
+/* SCORE RING */
+.score-wrap{display:flex;flex-direction:column;align-items:center;padding:24px}
+.score-ring{width:110px;height:110px;border-radius:50%;border:7px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:32px;font-weight:800;transition:border-color .6s var(--ease),color .6s var(--ease)}
+.score-ring.good{border-color:var(--primary);color:var(--primary);animation:pulse-g 2.5s infinite}
+.score-ring.warning{border-color:#f59e0b;color:#f59e0b;animation:pulse-y 2.5s infinite}
+.score-ring.danger{border-color:#ef4444;color:#ef4444;animation:pulse-r 2.5s infinite}
+@keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(14,184,127,.4)}50%{box-shadow:0 0 0 16px rgba(14,184,127,0)}}
+@keyframes pulse-y{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 16px rgba(245,158,11,0)}}
+@keyframes pulse-r{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 16px rgba(239,68,68,0)}}
+.score-ring .score-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;opacity:.7;margin-top:2px}
+.score-sub{margin-top:10px;font-size:13px;font-weight:600;color:var(--text-2)}
+.score-note{font-size:11px;color:var(--text-3);margin-top:4px;text-align:center}
+
+/* VITALS */
+.vitals-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:600px){.vitals-grid{grid-template-columns:repeat(3,1fr)}}
+.vitals-group label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text-3);display:block;margin-bottom:5px}
+.vitals-group input{width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text-1);background:var(--surface-2);transition:all .2s var(--ease)}
+.vitals-group input:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(14,184,127,.12)}
+
+/* BUTTONS */
+.btn-analyze{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary-dk),var(--primary));color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:16px;transition:all .3s var(--ease);position:relative;overflow:hidden;letter-spacing:.3px}
+.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(14,184,127,.35)}
+.btn-analyze:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--primary-dk),var(--primary));color:white;border:none;padding:11px 20px;border-radius:10px;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer;transition:all .25s var(--ease)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,184,127,.3)}
+.btn-warning-solid{background:#f59e0b;color:white;border:none;padding:14px 20px;border-radius:10px;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer;transition:all .25s var(--ease);width:100%;margin-top:12px}
+.btn-warning-solid:hover{background:#d97706;transform:translateY(-1px)}
+.quick-pill{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s var(--ease);margin:3px}
+.quick-pill:hover{background:var(--primary-lt);border-color:var(--primary);color:var(--primary-dk)}
+
+/* RISK ITEMS */
+.risk-item{padding:14px 16px;margin-bottom:10px;border-radius:12px;border-left:5px solid transparent;transition:transform .2s var(--ease),box-shadow .2s var(--ease);animation:slide-in-right .4s var(--ease) both}
+@keyframes slide-in-right{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.risk-item:hover{transform:translateX(4px);box-shadow:var(--shadow-md)}
+.risk-item.high{background:#fef2f2;border-left-color:#ef4444}
+.risk-item.medium{background:#fffbeb;border-left-color:#f59e0b}
+.risk-item.low{background:var(--primary-lt);border-left-color:var(--primary)}
+.risk-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.risk-name{font-weight:700;font-size:14px}
+.risk-pct{font-family:'DM Mono',monospace;font-weight:700;font-size:14px}
+.risk-bar{height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;margin-top:4px}
+.risk-bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.4s cubic-bezier(0.4,0,0.2,1)}
+.risk-bar-fill.high{background:linear-gradient(90deg,#ef4444,#f87171)}
+.risk-bar-fill.medium{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.risk-bar-fill.low{background:linear-gradient(90deg,var(--primary),#34d399)}
+
+/* CHART */
+.chart-wrap{position:relative;height:240px;width:100%;margin-top:12px}
+
+/* BODY MAP */
+.body-map-wrap{position:relative;width:220px;height:360px;margin:0 auto;background:var(--surface-2);border-radius:16px;border:1px solid var(--border)}
+.body-part{position:absolute;background:rgba(14,184,127,.1);border:2px solid rgba(14,184,127,.25);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.3px;color:var(--text-2);transition:all .2s var(--ease);user-select:none}
+.body-part:hover{background:rgba(14,184,127,.3);border-color:var(--primary);transform:scale(1.12)}
+.body-part.active{background:var(--primary);color:white;border-color:var(--primary-dk);animation:pop .3s var(--ease)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* SYMPTOM TAGS */
+.symptom-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface-2);font-size:12px;font-weight:600;cursor:pointer;margin:3px;transition:all .2s var(--ease)}
+.symptom-tag:hover{border-color:var(--primary);background:var(--primary-lt)}
+.symptom-tag.selected{background:var(--primary);color:white;border-color:var(--primary-dk)}
+
+/* HERBS */
+.herbs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:600px){.herbs-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.herbs-grid{grid-template-columns:repeat(4,1fr)}}
+.herb-card{background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:all .25s var(--ease);position:relative;overflow:hidden}
+.herb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--eth-green),var(--eth-yellow),var(--eth-red));opacity:0;transition:opacity .2s}
+.herb-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.herb-card:hover::before{opacity:1}
+.herb-icon{font-size:28px;margin-bottom:8px}
+.herb-name{font-weight:700;font-size:13px;color:var(--text-1)}
+.herb-sci{font-size:10px;font-style:italic;color:var(--text-3);margin-bottom:6px}
+.herb-uses{font-size:11px;color:var(--text-2);line-height:1.5}
+.herb-detail-card{background:var(--primary-lt);border:1.5px solid rgba(14,184,127,.2);border-radius:14px;padding:18px;margin-top:16px;animation:slide-in-right .3s var(--ease)}
+
+/* DRUGS */
+.drug-card{background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;transition:all .2s var(--ease);animation:slide-in-right .4s var(--ease) both}
+.drug-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+.drug-brand{font-weight:700;font-size:15px}
+.drug-generic{font-size:12px;color:var(--text-3);font-style:italic;margin-bottom:8px}
+.drug-text{font-size:12px;color:var(--text-2);line-height:1.6}
+
+/* INPUTS */
+.app-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;color:var(--text-1);background:var(--surface-2);transition:all .2s var(--ease)}
+.app-input:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(14,184,127,.1)}
+.app-select{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface-2);color:var(--text-1);cursor:pointer;transition:all .2s var(--ease)}
+.app-select:focus{outline:none;border-color:var(--primary)}
+
+/* CHAT */
+.chat-window{height:380px;overflow-y:auto;padding:16px;background:var(--surface-2);border-radius:12px;margin-bottom:12px;scroll-behavior:smooth}
+.chat-window::-webkit-scrollbar{width:4px}
+.chat-window::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.msg{max-width:78%;padding:10px 14px;border-radius:16px;margin-bottom:10px;font-size:13.5px;line-height:1.6;animation:msg-in .35s var(--ease) both}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-user{background:var(--primary);color:white;margin-left:auto;border-bottom-right-radius:4px}
+.msg-bot{background:white;color:var(--text-1);border:1.5px solid var(--border);border-bottom-left-radius:4px}
+.msg-bot strong{color:var(--primary-dk)}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row .app-input{flex:1}
+
+/* INTERACTION */
+.inter-row{display:grid;grid-template-columns:1fr 36px 1fr;gap:8px;align-items:center}
+.inter-plus{text-align:center;font-size:20px;font-weight:800;color:var(--text-3)}
+
+/* LOADING */
+#loadingOverlay{display:none;position:fixed;inset:0;background:rgba(13,31,26,.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center}
+#loadingOverlay.show{display:flex}
+.loading-box{background:white;padding:32px 48px;border-radius:20px;text-align:center;animation:zoom-in .3s var(--ease);box-shadow:var(--shadow-lg)}
+@keyframes zoom-in{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.loading-box .spinner{width:48px;height:48px;border:5px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-box p{font-weight:700;color:var(--text-1);font-size:14px}
+
+/* TOAST */
+#toastContainer{position:fixed;top:72px;right:16px;z-index:10000}
+.toast-msg{padding:10px 18px;border-radius:30px;margin-bottom:8px;font-size:13px;font-weight:600;color:white;animation:slide-in-right .35s var(--ease);box-shadow:0 4px 16px rgba(0,0,0,.18)}
+
+/* SOS */
+.sos-btn{position:fixed;bottom:24px;right:20px;width:58px;height:58px;border-radius:50%;background:#ef4444;color:white;border:none;font-size:22px;cursor:pointer;z-index:1000;box-shadow:0 0 0 0 rgba(239,68,68,.5);animation:sos-pulse 2s infinite;transition:transform .2s}
+.sos-btn:hover{transform:scale(1.1)}
+@keyframes sos-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 18px rgba(239,68,68,0)}}
+
+/* ABOUT */
+.about-feature{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-2);border-radius:12px;border:1px solid var(--border);margin-bottom:10px}
+.about-feature i{color:var(--primary);font-size:18px;width:24px;text-align:center}
+
+/* MISC */
+.empty-state{padding:40px 20px;text-align:center;color:var(--text-3)}
+.empty-state i{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:14px}
+input[type="range"]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;margin:8px 0}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 2px 8px rgba(14,184,127,.4)}
+.severity-row{display:flex;align-items:center;gap:10px}
+.severity-badge{font-family:'DM Mono',monospace;font-weight:700;font-size:16px;color:var(--primary);min-width:28px;text-align:center}
+.section{display:none}
+.section.active{display:block}
+.alert-danger-soft{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:12px;color:#b91c1c}
+.alert-info-soft{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:12px;color:#1d4ed8}
+.alert-warning-soft{background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:12px 14px;font-size:12px;color:#92400e}
+</style>
 </head>
 <body>
 
-    <div class="flag-stripe"><div></div><div></div><div></div></div>
+<div class="flag-stripe"><span></span><span></span><span></span></div>
 
-    <!-- Header -->
-    <header class="amz-header">
-        <div class="logo" onclick="switchSection('home')">
-            <i class="fas fa-heartbeat"></i>
-            <span>EthioHealth <small style="font-size:10px;color:#aaa;">AI Pro</small></span>
-        </div>
-        <div class="nav-icons">
-            <button onclick="switchSection('home')"><i class="fas fa-home"></i> Home</button>
-            <button onclick="switchSection('drugs')"><i class="fas fa-pills"></i> Drugs</button>
-            <button onclick="switchSection('chat')"><i class="fas fa-robot"></i> AI</button>
-            <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
-        </div>
-    </header>
+<header class="app-header">
+  <a class="logo" onclick="switchSection('home')">
+    <div class="logo-icon">🫀</div>
+    <div><div class="logo-text">EthioHealth <small>AI PRO</small></div></div>
+  </a>
+  <div class="header-actions">
+    <button class="hdr-btn" onclick="switchSection('home')"><i class="fas fa-home"></i> Home</button>
+    <button class="hdr-btn" onclick="switchSection('drugs')"><i class="fas fa-pills"></i> Drugs</button>
+    <button class="hdr-btn" onclick="switchSection('chat')"><i class="fas fa-robot"></i> AI</button>
+    <button class="hdr-btn danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+  </div>
+</header>
 
-    <!-- Category Navigation -->
-    <nav class="cat-nav">
-        <button class="active" onclick="switchSection('home')"><i class="fas fa-heartbeat me-1"></i>Health Check</button>
-        <button onclick="switchSection('symptoms')"><i class="fas fa-stethoscope me-1"></i>Symptoms</button>
-        <button onclick="switchSection('herbs')"><i class="fas fa-leaf me-1"></i>Traditional Herbs</button>
-        <button onclick="switchSection('drugs')"><i class="fas fa-pills me-1"></i>FDA Drugs</button>
-        <button onclick="switchSection('interactions')"><i class="fas fa-exclamation-triangle me-1"></i>Interactions</button>
-        <button onclick="switchSection('chat')"><i class="fas fa-robot me-1"></i>AI Chat</button>
-        <button onclick="switchSection('about')"><i class="fas fa-info-circle me-1"></i>About</button>
-    </nav>
+<nav class="cat-nav" id="catNav">
+  <button class="cat-btn active" data-section="home"><i class="fas fa-heartbeat me-1"></i>Health Check</button>
+  <button class="cat-btn" data-section="symptoms"><i class="fas fa-stethoscope me-1"></i>Symptoms</button>
+  <button class="cat-btn" data-section="herbs"><i class="fas fa-leaf me-1"></i>Herbs</button>
+  <button class="cat-btn" data-section="drugs"><i class="fas fa-pills me-1"></i>FDA Drugs</button>
+  <button class="cat-btn" data-section="interactions"><i class="fas fa-exclamation-triangle me-1"></i>Interactions</button>
+  <button class="cat-btn" data-section="chat"><i class="fas fa-robot me-1"></i>AI Chat</button>
+  <button class="cat-btn" data-section="about"><i class="fas fa-info-circle me-1"></i>About</button>
+</nav>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        
-        <!-- HOME -->
-        <div id="section-home" class="section-content">
-            <div class="hero animate__animated animate__fadeIn">
-                <span class="badge bg-light text-dark mb-2">🤖 Grok AI Powered</span>
-                <h3>Your Ethiopian Health Companion</h3>
-                <p class="mb-2">AI analysis · Traditional medicine · FDA drug database · Emergency support</p>
-            </div>
+<div class="main-content">
 
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="amz-card text-center animate__animated animate__fadeInLeft">
-                        <div class="score-ring" id="healthScoreRing">
-                            <span id="healthScore">--</span>
-                        </div>
-                        <p class="fw-bold mt-2 mb-0">Health Score</p>
-                        <small class="text-muted" id="lastUpdate">Click Analyze</small>
-                    </div>
-                </div>
-                <div class="col-md-8 mb-3">
-                    <div class="amz-card animate__animated animate__fadeInRight">
-                        <div class="card-title"><i class="fas fa-heartbeat" style="color:var(--primary);"></i> Quick Health Check</div>
-                        <div class="vitals-grid">
-                            <div class="input-group-animated"><label>Systolic BP</label><input type="number" id="sysInput" value="135"></div>
-                            <div class="input-group-animated"><label>Diastolic BP</label><input type="number" id="diaInput" value="88"></div>
-                            <div class="input-group-animated"><label>Blood Sugar</label><input type="number" id="gluInput" value="130"></div>
-                            <div class="input-group-animated"><label>BMI</label><input type="number" id="bmiInput" value="27" step="0.1"></div>
-                            <div class="input-group-animated"><label>Temperature °C</label><input type="number" id="tempInput" value="37.2" step="0.1"></div>
-                            <div class="input-group-animated"><label>Age</label><input type="number" id="ageInput" value="45"></div>
-                        </div>
-                        <button class="btn-yellow mt-3" onclick="runAnalysis()">
-                            <i class="fas fa-microchip me-2"></i>Analyze with Grok AI
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="amz-card animate__animated animate__fadeInUp">
-                <div class="card-title"><i class="fas fa-chart-pie" style="color:#f59e0b;"></i> AI Risk Assessment</div>
-                <div id="riskResults"><p class="text-center text-muted py-3">Enter vitals and click Analyze</p></div>
-                <div class="chart-container"><canvas id="healthChart"></canvas></div>
-            </div>
-        </div>
-
-        <!-- SYMPTOMS -->
-        <div id="section-symptoms" class="section-content" style="display:none;">
-            <div class="row">
-                <div class="col-md-5 mb-3">
-                    <div class="amz-card">
-                        <div class="card-title"><i class="fas fa-person"></i> Interactive Body Map</div>
-                        <p class="small text-muted mb-2">Click body parts to select symptoms</p>
-                        <div style="position:relative;width:220px;height:350px;margin:0 auto;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
-                            <div class="body-part-3d" data-part="head" style="width:70px;height:70px;top:10px;left:50%;transform:translateX(-50%);">HEAD</div>
-                            <div class="body-part-3d" data-part="chest" style="width:100px;height:80px;top:90px;left:50%;transform:translateX(-50%);">CHEST</div>
-                            <div class="body-part-3d" data-part="abdomen" style="width:85px;height:70px;top:180px;left:50%;transform:translateX(-50%);">ABDOMEN</div>
-                            <div class="body-part-3d" data-part="left_arm" style="width:30px;height:80px;top:90px;left:5px;border-radius:15px;">L ARM</div>
-                            <div class="body-part-3d" data-part="right_arm" style="width:30px;height:80px;top:90px;right:5px;border-radius:15px;">R ARM</div>
-                            <div class="body-part-3d" data-part="left_leg" style="width:35px;height:90px;top:260px;left:35px;border-radius:15px;">L LEG</div>
-                            <div class="body-part-3d" data-part="right_leg" style="width:35px;height:90px;top:260px;right:35px;border-radius:15px;">R LEG</div>
-                        </div>
-                        <div id="bodyPartSymptoms" class="mt-2"></div>
-                    </div>
-                </div>
-                <div class="col-md-7 mb-3">
-                    <div class="amz-card">
-                        <div class="card-title"><i class="fas fa-clipboard-list"></i> Symptom Details</div>
-                        <label class="form-label small fw-bold">Duration</label>
-                        <select id="symptomDuration" class="form-select mb-2"><option value="hours">Few hours</option><option value="1day">1 day</option><option value="2-3days">2-3 days</option><option value="week">1 week</option><option value="weeks">Several weeks</option></select>
-                        <label class="form-label small fw-bold">Severity (1-10)</label>
-                        <input type="range" class="form-range" id="severitySlider" min="1" max="10" value="5">
-                        <span id="severityVal" class="badge bg-primary">5</span>
-                        <div class="alert alert-info small mt-2"><strong>Selected:</strong> <span id="selectedSymptomsList">None</span></div>
-                        <button class="btn-yellow mt-2" onclick="analyzeSymptoms()"><i class="fas fa-microchip me-2"></i>AI Diagnose</button>
-                        <div id="symptomResults" class="mt-3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- HERBS -->
-        <div id="section-herbs" class="section-content" style="display:none;">
-            <div class="amz-card">
-                <div class="card-title"><i class="fas fa-leaf" style="color:var(--primary);"></i> Ethiopian Traditional Medicine</div>
-                <input type="text" class="form-control mb-3" id="herbSearch" placeholder="Search herbs..." onkeyup="filterHerbs()">
-                <div class="herb-grid" id="herbList"><p class="text-muted">Loading...</p></div>
-                <div id="herbDetail" class="mt-3" style="display:none;"></div>
-            </div>
-        </div>
-
-        <!-- FDA DRUGS -->
-        <div id="section-drugs" class="section-content" style="display:none;">
-            <div class="amz-card">
-                <div class="card-title"><i class="fas fa-pills text-primary"></i> FDA Drug Database Search</div>
-                <p class="small text-muted mb-2">Search U.S. FDA database for official drug information</p>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="drugSearchInput" placeholder="Enter drug name (metformin, aspirin, enalapril)...">
-                    <button class="btn btn-success" onclick="searchFDA()"><i class="fas fa-search"></i> Search</button>
-                </div>
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                    <span class="badge bg-light text-dark" style="cursor:pointer" onclick="quickFDA('metformin')">Metformin</span>
-                    <span class="badge bg-light text-dark" style="cursor:pointer" onclick="quickFDA('aspirin')">Aspirin</span>
-                    <span class="badge bg-light text-dark" style="cursor:pointer" onclick="quickFDA('enalapril')">Enalapril</span>
-                    <span class="badge bg-light text-dark" style="cursor:pointer" onclick="quickFDA('amlodipine')">Amlodipine</span>
-                </div>
-                <div id="drugResults"><p class="text-muted text-center py-3">Search for a medication above</p></div>
-            </div>
-        </div>
-
-        <!-- INTERACTIONS -->
-        <div id="section-interactions" class="section-content" style="display:none;">
-            <div class="amz-card">
-                <div class="card-title"><i class="fas fa-exclamation-triangle text-warning"></i> Drug Interaction Checker</div>
-                <div class="row g-2">
-                    <div class="col-5"><input type="text" class="form-control" id="interDrug1" placeholder="Drug 1"></div>
-                    <div class="col-2 text-center"><span class="fs-4 fw-bold">+</span></div>
-                    <div class="col-5"><input type="text" class="form-control" id="interDrug2" placeholder="Drug 2"></div>
-                </div>
-                <button class="btn btn-warning w-100 mt-2" onclick="checkInteraction()"><i class="fas fa-check me-2"></i>Check Safety</button>
-                <div id="interResults" class="mt-3"></div>
-            </div>
-        </div>
-
-        <!-- AI CHAT -->
-        <div id="section-chat" class="section-content" style="display:none;">
-            <div class="amz-card">
-                <div class="card-title"><i class="fas fa-robot" style="color:#8b5cf6;"></i> Grok AI Health Chat</div>
-                <div class="chat-box" id="chatBox"><div class="chat-msg chat-bot"><strong>🤖 Grok:</strong> Hello! Ask me about symptoms, diseases, drugs, or Ethiopian traditional medicine.</div></div>
-                <div class="input-group"><input type="text" class="form-control" id="chatInput" placeholder="Ask about your health..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-success" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button></div>
-            </div>
-        </div>
-
-        <!-- ABOUT -->
-        <div id="section-about" class="section-content" style="display:none;">
-            <div class="amz-card">
-                <h4><i class="fas fa-heartbeat" style="color:var(--primary);"></i> About EthioHealth AI Pro</h4><hr>
-                <p><strong>Version:</strong> 2.0.0 | <strong>Powered by:</strong> Grok AI + OpenFDA</p>
-                <p><strong>Features:</strong></p>
-                <ul><li>✅ AI Health Analysis (5+ diseases)</li><li>✅ Interactive Body Map</li><li>✅ Ethiopian Traditional Medicine (8 herbs)</li><li>✅ FDA Drug Database Search</li><li>✅ Drug Interaction Checker</li><li>✅ Grok AI Health Chat</li><li>✅ Emergency SOS (907)</li></ul>
-                <p class="text-muted small">⚠️ AI-assisted screening only. Consult healthcare providers.</p>
-            </div>
-        </div>
+  <!-- HOME -->
+  <div id="section-home" class="section active">
+    <div class="hero">
+      <div class="hero-badge">🤖 Grok AI Powered</div>
+      <h2>Your Ethiopian Health Companion</h2>
+      <p>AI analysis · Traditional medicine · FDA drug database · Emergency support</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="val">8+</div><div class="lbl">Herbs</div></div>
+        <div class="hero-stat"><div class="val">5+</div><div class="lbl">Conditions</div></div>
+        <div class="hero-stat"><div class="val">24/7</div><div class="lbl">AI Chat</div></div>
+        <div class="hero-stat"><div class="val">907</div><div class="lbl">Emergency</div></div>
+      </div>
     </div>
 
-    <!-- SOS -->
-    <button class="sos-btn" onclick="if(confirm('Call Ethiopian Emergency (907)?'))window.location.href='tel:907'"><i class="fas fa-ambulance"></i></button>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="score-wrap">
+            <div class="score-ring" id="healthScoreRing">
+              <span id="healthScore">--</span>
+              <span class="score-label">Score</span>
+            </div>
+            <div class="score-sub" id="scoreLabel">Enter Vitals</div>
+            <div class="score-note" id="scoreNote">Click Analyze to get your health score</div>
+          </div>
+          <div id="quickStats" style="padding:0 20px 20px;"></div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card h-100">
+          <div class="card-inner">
+            <div class="section-title"><i class="fas fa-heartbeat"></i>Quick Health Check</div>
+            <div class="vitals-grid">
+              <div class="vitals-group"><label>Systolic BP</label><input type="number" id="sysInput" value="135" min="60" max="250"></div>
+              <div class="vitals-group"><label>Diastolic BP</label><input type="number" id="diaInput" value="88" min="40" max="150"></div>
+              <div class="vitals-group"><label>Blood Sugar</label><input type="number" id="gluInput" value="130" min="60" max="600"></div>
+              <div class="vitals-group"><label>BMI</label><input type="number" id="bmiInput" value="27" step="0.1" min="10" max="60"></div>
+              <div class="vitals-group"><label>Temperature °C</label><input type="number" id="tempInput" value="37.2" step="0.1" min="34" max="42"></div>
+              <div class="vitals-group"><label>Age</label><input type="number" id="ageInput" value="45" min="1" max="120"></div>
+            </div>
+            <button class="btn-analyze" onclick="runAnalysis()"><i class="fas fa-microchip me-2"></i>Analyze with Grok AI</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Loading -->
-    <div id="loadingOverlay"><div class="loading-box"><div class="spinner-border text-success mb-2" style="width:3rem;height:3rem;"></div><p class="fw-bold" id="loadingText">Processing...</p></div></div>
-    <div id="toastContainer"></div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-chart-bar"></i>AI Risk Assessment</div>
+        <div id="riskResults">
+          <div class="empty-state"><i class="fas fa-chart-pie d-block"></i><p>Enter vitals above and click Analyze to see your risk assessment</p></div>
+        </div>
+        <div class="chart-wrap" id="chartWrap" style="display:none;"><canvas id="healthChart"></canvas></div>
+      </div>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const API_URL = 'https://ethiohalth-api.onrender.com/api/v1';
-        let selectedSymptoms = [], healthChart = null, allHerbs = [];
-        
-        function init() {
-            if (!localStorage.getItem('token') && !localStorage.getItem('guest')) { window.location.href = 'index.html'; return; }
-            setupBodyMap(); loadHerbs();
-            document.getElementById('severitySlider').addEventListener('input', function() { document.getElementById('severityVal').textContent = this.value; });
-        }
-        
-        function switchSection(section) {
-            document.querySelectorAll('.section-content').forEach(s => s.style.display = 'none');
-            const el = document.getElementById('section-' + section);
-            if (el) { el.style.display = 'block'; el.classList.add('animate__animated', 'animate__fadeIn'); }
-            document.querySelectorAll('.cat-nav button').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`.cat-nav button[onclick*="${section}"]`);
-            if (btn) btn.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        function toast(msg, type) {
-            const bg = { success: '#059669', warning: '#d97706', error: '#dc2626', info: '#333' }[type] || '#333';
-            const el = document.createElement('div'); el.className = 'toast-msg'; el.style.background = bg; el.textContent = msg;
-            document.getElementById('toastContainer').appendChild(el); setTimeout(() => el.remove(), 3000);
-        }
-        
-        function showLoading(t) { document.getElementById('loadingOverlay').style.display = 'flex'; if(t) document.getElementById('loadingText').textContent = t; }
-        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
-        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
-        
-        // ============ HEALTH ANALYSIS ============
-        async function runAnalysis() {
-            const data = { systolic: +document.getElementById('sysInput').value||120, diastolic: +document.getElementById('diaInput').value||80, glucose: +document.getElementById('gluInput').value||95, bmi: +document.getElementById('bmiInput').value||24, temperature: +document.getElementById('tempInput').value||36.6, age: +document.getElementById('ageInput').value||30 };
-            showLoading('🤖 Grok AI analyzing...');
-            try {
-                const r = await fetch(API_URL + '/health/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-                const d = await r.json(); hideLoading();
-                if (d.success) { displayResults(d.data); toast('✅ Server analysis complete', 'success'); }
-            } catch { hideLoading(); localAnalysis(data); }
-        }
-        
-        function localAnalysis(d) {
-            const f = []; let p = 0;
-            if (d.systolic>=140) { p+=25; f.push({name:'Hypertension',icon:'fa-tint',risk:Math.min(100,(d.systolic-120)*2),level:d.systolic>=160?'high':'medium'}); }
-            if (d.glucose>=126) { p+=25; f.push({name:'Diabetes',icon:'fa-candy-cane',risk:Math.min(100,(d.glucose-100)*1.5),level:d.glucose>=200?'high':'medium'}); }
-            if (d.temperature>=38) { p+=20; f.push({name:'Malaria Risk',icon:'fa-mosquito',risk:Math.min(100,(d.temperature-36)*20),level:'medium'}); }
-            displayResults({score:Math.max(0,Math.min(100,100-p)),findings:f});
-            toast('📱 Local analysis used', 'warning');
-        }
-        
-        function displayResults(r) {
-            const s = document.getElementById('healthScore'); s.textContent = r.score;
-            s.style.color = r.score>=70?'#10b981':r.score>=40?'#f59e0b':'#ef4444';
-            document.getElementById('lastUpdate').textContent = 'Updated just now';
-            const c = document.getElementById('riskResults');
-            if (!r.findings?.length) { c.innerHTML = '<p class="text-center text-success py-3">✅ No risks detected</p>'; return; }
-            c.innerHTML = r.findings.map(f => `<div class="risk-item ${f.level||'low'}"><div class="d-flex justify-content-between"><strong><i class="fas ${f.icon} me-2"></i>${f.name}</strong><span class="fw-bold">${f.risk}%</span></div><div class="risk-bar"><div class="risk-bar-fill ${f.level||'low'}" style="width:${f.risk}%"></div></div></div>`).join('');
-            updateChart(r.findings||[]);
-        }
-        
-        function updateChart(f) {
-            const cv = document.getElementById('healthChart'); if (!cv||!f.length) return;
-            if (healthChart) healthChart.destroy();
-            healthChart = new Chart(cv.getContext('2d'), { type:'bar', data:{ labels:f.map(x=>x.name.substring(0,12)), datasets:[{ data:f.map(x=>x.risk), backgroundColor:f.map(x=>x.level==='high'?'#ef4444':x.level==='medium'?'#f59e0b':'#10b981'), borderRadius:8, maxBarThickness:50 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100}} } });
-        }
-        
-        // ============ BODY MAP ============
-        function setupBodyMap() {
-            document.querySelectorAll('.body-part-3d').forEach(p => p.addEventListener('click', function() {
-                document.querySelectorAll('.body-part-3d').forEach(x => x.classList.remove('selected'));
-                this.classList.add('selected');
-                const m = { head:['headache','dizziness','fever','blurred_vision','confusion'], chest:['chest_pain','shortness_breath','cough','rapid_heartbeat'], abdomen:['abdominal_pain','nausea','vomiting','diarrhea'], left_arm:['arm_pain','numbness','tingling'], right_arm:['arm_pain','numbness','tingling'], left_leg:['leg_pain','swelling','cramps'], right_leg:['leg_pain','swelling','cramps'] };
-                const s = m[this.dataset.part]||['pain'];
-                document.getElementById('bodyPartSymptoms').innerHTML = s.map(x => `<span class="badge bg-light text-dark me-1 mb-1" style="cursor:pointer" onclick="toggleSymptom('${x}')">${x.replace(/_/g,' ')} ${selectedSymptoms.includes(x)?'✓':''}</span>`).join('');
-            }));
-        }
-        
-        function toggleSymptom(s) { const i = selectedSymptoms.indexOf(s); i>-1 ? selectedSymptoms.splice(i,1) : selectedSymptoms.push(s); document.getElementById('selectedSymptomsList').innerHTML = selectedSymptoms.length ? selectedSymptoms.map(x=>`<span class="badge bg-success me-1">${x.replace(/_/g,' ')}</span>`).join('') : 'None'; }
-        
-        async function analyzeSymptoms() {
-            if (!selectedSymptoms.length) return toast('Select symptoms first','warning');
-            showLoading('Analyzing...');
-            try {
-                const r = await fetch(API_URL+'/symptoms/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({symptoms:selectedSymptoms, severity:+document.getElementById('severitySlider').value, duration:document.getElementById('symptomDuration').value}) });
-                const d = await r.json(); hideLoading();
-                if (d.success) document.getElementById('symptomResults').innerHTML = d.data.findings.map(f => `<div class="risk-item ${f.urgency==='urgent'?'high':'medium'} mt-2"><strong><i class="fas ${f.icon} me-2"></i>${f.disease}</strong><span class="float-end fw-bold">${f.confidence}%</span><p class="small mb-0">${f.message}</p><small class="text-success">✅ ${f.action}</small></div>`).join('');
-            } catch { hideLoading(); toast('Server unavailable','error'); }
-        }
-        
-        // ============ HERBS ============
-        async function loadHerbs() {
-            try { const r = await fetch(API_URL+'/herbs'); const d = await r.json(); if (d.success) { allHerbs = d.data; renderHerbs(allHerbs); } }
-            catch { allHerbs = [{id:'tena_adam',name:'Tena Adam',scientific:'Ruta chalepensis',uses:'Stomach pain, headache',warnings:['Avoid blood thinners']},{id:'moringa',name:'Moringa',scientific:'Moringa stenopetala',uses:'Malnutrition, BP, diabetes',warnings:['Monitor blood sugar']}]; renderHerbs(allHerbs); }
-        }
-        function renderHerbs(h) { document.getElementById('herbList').innerHTML = h.map(x => `<div class="herb-card" onclick="showHerbDetail('${x.id}')"><i class="fas fa-leaf text-success fs-4"></i><h6>${x.name}</h6><small class="text-purple">${x.scientific}</small><p class="small">${x.uses}</p></div>`).join(''); }
-        function filterHerbs() { const q = document.getElementById('herbSearch').value.toLowerCase(); renderHerbs(q ? allHerbs.filter(h => h.name.toLowerCase().includes(q)||h.uses.toLowerCase().includes(q)) : allHerbs); }
-        function showHerbDetail(id) { const h = allHerbs.find(x=>x.id===id); if(!h)return; document.getElementById('herbDetail').style.display='block'; document.getElementById('herbDetail').innerHTML = `<div class="card"><div class="card-body"><button class="btn btn-sm btn-outline-secondary float-end" onclick="document.getElementById('herbDetail').style.display='none'">✕</button><h5>${h.name}</h5><p class="text-purple">${h.scientific}</p><p>${h.uses}</p>${h.warnings?`<div class="alert alert-danger small">${h.warnings.map(w=>'⚠️ '+w).join('<br>')}</div>`:''}</div></div>`; }
-        
-        // ============ FDA DRUG SEARCH ============
-        async function searchFDA() {
-            const q = document.getElementById('drugSearchInput').value.trim(); if (!q) return toast('Enter drug name','warning');
-            document.getElementById('drugResults').innerHTML = '<p class="text-center py-3"><div class="spinner-border text-success"></div></p>';
-            try {
-                const r = await fetch(`${API_URL}/fda/drugs?name=${encodeURIComponent(q)}`); const d = await r.json();
-                document.getElementById('drugResults').innerHTML = d.data?.drugs?.length ? d.data.drugs.map(x => `<div class="drug-result-card"><div class="d-flex justify-content-between"><strong>${x.brandName}</strong><span class="badge bg-info">${x.source||'FDA'}</span></div><small class="text-purple">${x.genericName}</small>${x.indications?`<p class="small mt-1">${x.indications.substring(0,200)}...</p>`:''}${x.warnings?`<div class="alert alert-danger small mt-1">⚠️ ${x.warnings.substring(0,150)}...</div>`:''}</div>`).join('') : '<p class="text-muted text-center">No results. Try different name.</p>';
-            } catch { document.getElementById('drugResults').innerHTML = '<p class="text-danger">Search failed. Try again.</p>'; }
-        }
-        function quickFDA(name) { document.getElementById('drugSearchInput').value = name; searchFDA(); }
-        
-        // ============ INTERACTIONS ============
-        function checkInteraction() {
-            const d1 = document.getElementById('interDrug1').value.trim(), d2 = document.getElementById('interDrug2').value.trim();
-            if (!d1||!d2) return toast('Enter both drug names','warning');
-            document.getElementById('interResults').innerHTML = `<div class="alert alert-warning"><strong>⚠️ ${d1} + ${d2}</strong><p class="mb-0">Always consult your doctor or pharmacist before combining medications. In Ethiopia, visit your nearest health center for free consultation.</p></div>`;
-        }
-        
-        // ============ AI CHAT ============
-        async function sendChat() {
-            const m = document.getElementById('chatInput').value.trim(); if (!m) return;
-            const box = document.getElementById('chatBox'); box.innerHTML += `<div class="chat-msg chat-user">${m}</div>`;
-            document.getElementById('chatInput').value = ''; box.scrollTop = box.scrollHeight;
-            try {
-                const r = await fetch(API_URL+'/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:m,language:'en'}) });
-                const d = await r.json();
-                box.innerHTML += `<div class="chat-msg chat-bot"><strong>🤖 Grok:</strong> ${d.data?.response?.en||d.data?.response||'I understand. Let me help.'}</div>`;
-            } catch { box.innerHTML += '<div class="chat-msg chat-bot"><strong>🤖 Grok:</strong> Offline. For emergencies call 907.</div>'; }
-            box.scrollTop = box.scrollHeight;
-        }
-        
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+  <!-- SYMPTOMS -->
+  <div id="section-symptoms" class="section">
+    <div class="row g-3">
+      <div class="col-md-5">
+        <div class="card">
+          <div class="card-inner">
+            <div class="section-title"><i class="fas fa-person"></i>Body Map</div>
+            <p style="font-size:12px;color:var(--text-3);margin-bottom:12px;">Tap a body part to see symptoms</p>
+            <div class="body-map-wrap">
+              <div class="body-part active" data-part="head" style="width:70px;height:70px;top:10px;left:50%;transform:translateX(-50%);">HEAD</div>
+              <div class="body-part" data-part="chest" style="width:100px;height:80px;top:90px;left:50%;transform:translateX(-50%);border-radius:16px;">CHEST</div>
+              <div class="body-part" data-part="abdomen" style="width:85px;height:70px;top:180px;left:50%;transform:translateX(-50%);border-radius:14px;">ABDOMEN</div>
+              <div class="body-part" data-part="left_arm" style="width:30px;height:80px;top:90px;left:5px;border-radius:15px;">L</div>
+              <div class="body-part" data-part="right_arm" style="width:30px;height:80px;top:90px;right:5px;border-radius:15px;">R</div>
+              <div class="body-part" data-part="left_leg" style="width:35px;height:90px;top:262px;left:35px;border-radius:15px;">LL</div>
+              <div class="body-part" data-part="right_leg" style="width:35px;height:90px;top:262px;right:35px;border-radius:15px;">RL</div>
+            </div>
+            <div id="bodyPartSymptoms" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="card">
+          <div class="card-inner">
+            <div class="section-title"><i class="fas fa-clipboard-list"></i>Symptom Details</div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;">Duration</label>
+            <select id="symptomDuration" class="app-select mb-3 mt-1">
+              <option value="hours">Few hours</option>
+              <option value="1day">1 day</option>
+              <option value="2-3days">2-3 days</option>
+              <option value="week">1 week</option>
+              <option value="weeks">Several weeks</option>
+            </select>
+            <label style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;">Severity</label>
+            <div class="severity-row mt-1 mb-3">
+              <input type="range" id="severitySlider" min="1" max="10" value="5" style="flex:1;">
+              <div class="severity-badge" id="severityVal">5</div>
+            </div>
+            <div class="alert-info-soft mb-3">
+              <strong>Selected symptoms:</strong>
+              <div id="selectedSymptomsList" style="margin-top:6px;"><span style="color:var(--text-3);font-size:12px;">None selected — tap the body map</span></div>
+            </div>
+            <button class="btn-analyze" onclick="analyzeSymptoms()"><i class="fas fa-microchip me-2"></i>AI Diagnose</button>
+            <div id="symptomResults" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERBS -->
+  <div id="section-herbs" class="section">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-leaf"></i>Ethiopian Traditional Medicine</div>
+        <input type="text" class="app-input mb-3" id="herbSearch" placeholder="Search herbs by name or use..." oninput="filterHerbs()">
+        <div class="herbs-grid" id="herbList"><div class="empty-state"><div class="spinner" style="width:32px;height:32px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto;"></div></div></div>
+        <div id="herbDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FDA DRUGS -->
+  <div id="section-drugs" class="section">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-pills"></i>FDA Drug Database</div>
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Search the U.S. FDA database for official drug information, warnings, and indications.</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" class="app-input" id="drugSearchInput" placeholder="Enter drug name (e.g. metformin, aspirin)..." onkeydown="if(event.key==='Enter')searchFDA()" style="flex:1;">
+          <button class="btn-primary" onclick="searchFDA()"><i class="fas fa-search"></i> Search</button>
+        </div>
+        <div style="margin-bottom:16px;">
+          <span class="quick-pill" onclick="quickFDA('metformin')">💊 Metformin</span>
+          <span class="quick-pill" onclick="quickFDA('aspirin')">💊 Aspirin</span>
+          <span class="quick-pill" onclick="quickFDA('enalapril')">💊 Enalapril</span>
+          <span class="quick-pill" onclick="quickFDA('amlodipine')">💊 Amlodipine</span>
+          <span class="quick-pill" onclick="quickFDA('amoxicillin')">💊 Amoxicillin</span>
+          <span class="quick-pill" onclick="quickFDA('paracetamol')">💊 Paracetamol</span>
+        </div>
+        <div id="drugResults"><div class="empty-state"><i class="fas fa-search d-block"></i><p>Search for a medication above</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIONS -->
+  <div id="section-interactions" class="section">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-exclamation-triangle"></i>Drug Interaction Checker</div>
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:16px;">Check if two medications have known interactions before combining them.</p>
+        <div class="inter-row mb-3">
+          <input type="text" class="app-input" id="interDrug1" placeholder="Drug 1 (e.g. aspirin)">
+          <div class="inter-plus">+</div>
+          <input type="text" class="app-input" id="interDrug2" placeholder="Drug 2 (e.g. warfarin)">
+        </div>
+        <button class="btn-warning-solid" onclick="checkInteraction()"><i class="fas fa-shield-alt me-2"></i>Check Interaction Safety</button>
+        <div id="interResults" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHAT -->
+  <div id="section-chat" class="section">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-robot"></i>Grok AI Health Chat</div>
+        <div class="chat-window" id="chatBox">
+          <div class="msg msg-bot"><strong>🤖 Grok:</strong> Hello! I'm your EthioHealth AI. Ask me about symptoms, diseases, drugs, or Ethiopian traditional medicine — I'm here 24/7.</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="app-input" id="chatInput" placeholder="Ask about your health..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="btn-primary" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="section-about" class="section">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-title"><i class="fas fa-info-circle"></i>About EthioHealth AI Pro</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:20px;"><strong>Version:</strong> 2.0.0 &nbsp;|&nbsp; <strong>Powered by:</strong> Grok AI + OpenFDA API</p>
+        <div class="about-feature"><i class="fas fa-heartbeat"></i><div><strong>AI Health Analysis</strong><div style="font-size:12px;color:var(--text-3);">Detects 5+ conditions from vitals</div></div></div>
+        <div class="about-feature"><i class="fas fa-person"></i><div><strong>Interactive Body Map</strong><div style="font-size:12px;color:var(--text-3);">Visual symptom selection & AI diagnosis</div></div></div>
+        <div class="about-feature"><i class="fas fa-leaf"></i><div><strong>Ethiopian Traditional Medicine</strong><div style="font-size:12px;color:var(--text-3);">8 curated herbs with safety info</div></div></div>
+        <div class="about-feature"><i class="fas fa-pills"></i><div><strong>FDA Drug Database</strong><div style="font-size:12px;color:var(--text-3);">Official U.S. FDA medication lookup</div></div></div>
+        <div class="about-feature"><i class="fas fa-exclamation-triangle"></i><div><strong>Drug Interaction Checker</strong><div style="font-size:12px;color:var(--text-3);">Checks known drug-drug interactions</div></div></div>
+        <div class="about-feature"><i class="fas fa-robot"></i><div><strong>Grok AI Health Chat</strong><div style="font-size:12px;color:var(--text-3);">24/7 AI health assistant</div></div></div>
+        <div class="about-feature"><i class="fas fa-ambulance"></i><div><strong>Emergency SOS</strong><div style="font-size:12px;color:var(--text-3);">One-tap Ethiopian Emergency (907)</div></div></div>
+        <div class="alert-warning-soft mt-4">⚠️ <strong>Disclaimer:</strong> EthioHealth AI Pro is for educational purposes only. Always consult a qualified healthcare provider for medical advice.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<button class="sos-btn" onclick="callSOS()" title="Ethiopian Emergency 907"><i class="fas fa-ambulance"></i></button>
+<div id="loadingOverlay"><div class="loading-box"><div class="spinner"></div><p id="loadingText">Processing...</p></div></div>
+<div id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================
+// FIX #1 — Corrected API URL (was "ethiohalth", missing 'e')
+// ============================================================
+const API_URL = 'https://ethiohealth-api.onrender.com/api/v1';
+
+let selectedSymptoms = [], healthChart = null, allHerbs = [];
+
+const SYMPTOM_MAP = {
+  head:      ['headache','dizziness','fever','blurred_vision','confusion','neck_stiffness'],
+  chest:     ['chest_pain','shortness_breath','cough','rapid_heartbeat','chest_tightness'],
+  abdomen:   ['abdominal_pain','nausea','vomiting','diarrhea','bloating','loss_appetite'],
+  left_arm:  ['arm_pain','numbness','tingling','weakness'],
+  right_arm: ['arm_pain','numbness','tingling','weakness'],
+  left_leg:  ['leg_pain','swelling','cramps','numbness'],
+  right_leg: ['leg_pain','swelling','cramps','numbness']
+};
+
+// FIX #7 — Full 8-herb dataset (was only 2 in original fallback)
+const HERBS_FALLBACK = [
+  {id:'tena_adam',   name:'Tena Adam',    emoji:'🌿',scientific:'Ruta chalepensis',    uses:'Stomach pain, headache, menstrual cramps, intestinal worms',   warnings:['Avoid in pregnancy','May interact with blood thinners']},
+  {id:'moringa',     name:'Moringa',      emoji:'🌱',scientific:'Moringa stenopetala', uses:'Malnutrition, high blood pressure, diabetes, anemia',           warnings:['Monitor blood sugar if diabetic','Avoid root bark in pregnancy']},
+  {id:'kosso',       name:'Kosso',        emoji:'🌳',scientific:'Hagenia abyssinica',  uses:'Traditional tapeworm treatment (anthelmintic)',                 warnings:['Toxic in high doses','Consult a doctor before use','Not for children']},
+  {id:'gesho',       name:'Gesho',        emoji:'🍃',scientific:'Rhamnus prinoides',   uses:'Digestive aid, used in tej & tella brewing, appetite stimulant',warnings:['Avoid in liver disease']},
+  {id:'tej_sar',     name:'Tej Sar',      emoji:'🌾',scientific:'Embelia schimperi',   uses:'Intestinal worms, abdominal pain',                             warnings:['Use with caution','Seek medical advice']},
+  {id:'damakase',    name:'Damakasé',     emoji:'🍀',scientific:'Ocimum lamiifolium',  uses:'Common cold, fever, respiratory infections, headache',          warnings:['Generally safe in food amounts']},
+  {id:'enkifaye',    name:'Enkifaye',     emoji:'🌺',scientific:'Dodonaea angustifolia',uses:'Wound healing, skin conditions, fever, malaria',              warnings:['External use preferred','Avoid internal use without guidance']},
+  {id:'yetimirbirr', name:'Yetimirt Birr',emoji:'🌼',scientific:'Thymus serrulatus',   uses:'Respiratory infections, cough, bronchitis, antiseptic',         warnings:['Generally safe','Large amounts may cause nausea']}
+];
+
+// Known drug interactions for offline use (FIX #8)
+const KNOWN_INTERACTIONS = [
+  {drugs:['aspirin','warfarin'],      severity:'high',   msg:'Significantly increases bleeding risk. Both drugs inhibit clotting — combination can cause dangerous hemorrhage. Do NOT combine without strict medical supervision.'},
+  {drugs:['aspirin','ibuprofen'],     severity:'medium', msg:'May reduce aspirin\'s cardioprotective effect and increases GI bleeding risk when combined.'},
+  {drugs:['metformin','alcohol'],     severity:'high',   msg:'Risk of lactic acidosis — a serious, potentially fatal condition. Avoid alcohol while taking metformin.'},
+  {drugs:['enalapril','potassium'],   severity:'medium', msg:'ACE inhibitors like enalapril can raise blood potassium. Adding potassium supplements may cause hyperkalemia.'},
+  {drugs:['amlodipine','simvastatin'],severity:'medium', msg:'Amlodipine increases simvastatin blood levels, raising the risk of muscle breakdown (rhabdomyolysis).'},
+  {drugs:['ciprofloxacin','antacids'],severity:'medium', msg:'Antacids significantly reduce ciprofloxacin absorption. Take at least 2 hours apart.'},
+  {drugs:['metronidazole','alcohol'], severity:'high',   msg:'Causes severe disulfiram-like reaction: nausea, vomiting, flushing, rapid heartbeat. Avoid alcohol during treatment and 48h after.'}
+];
+
+// ── INIT ──────────────────────────────────────────
+function init() {
+  // FIX #2: allow guest/demo mode rather than hard redirect
+  if (!localStorage.getItem('token') && !localStorage.getItem('guest')) {
+    localStorage.setItem('guest', '1');
+  }
+  setupCatNav();
+  setupBodyMap();
+  loadHerbs();
+  document.getElementById('severitySlider').addEventListener('input', function() {
+    document.getElementById('severityVal').textContent = this.value;
+  });
+  showBodyPartSymptoms('head');
+}
+
+// ── NAVIGATION (FIX #3: data-section attribute, not onclick text matching) ──
+function setupCatNav() {
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+  });
+}
+
+function switchSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  const sec = document.getElementById('section-' + name);
+  if (sec) sec.classList.add('active');
+  const btn = document.querySelector(`.cat-btn[data-section="${name}"]`);
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── UTILITIES ──────────────────────────────────────
+function toast(msg, type = 'info') {
+  const colors = {success:'#059669', warning:'#d97706', error:'#dc2626', info:'#334155'};
+  const el = document.createElement('div');
+  el.className = 'toast-msg';
+  el.style.background = colors[type] || colors.info;
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function showLoading(text) {
+  document.getElementById('loadingText').textContent = text || 'Processing...';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+function callSOS() { if (confirm('Call Ethiopian Emergency (907)?')) window.location.href = 'tel:907'; }
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ── HEALTH ANALYSIS ────────────────────────────────
+async function runAnalysis() {
+  const data = {
+    systolic:    +document.getElementById('sysInput').value  || 120,
+    diastolic:   +document.getElementById('diaInput').value  || 80,
+    glucose:     +document.getElementById('gluInput').value  || 95,
+    bmi:         +document.getElementById('bmiInput').value  || 24,
+    temperature: +document.getElementById('tempInput').value || 36.6,
+    age:         +document.getElementById('ageInput').value  || 30
+  };
+  showLoading('Grok AI analyzing your vitals...');
+  try {
+    const res = await fetch(API_URL + '/health/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+    hideLoading();
+    if (json.success) { displayResults(json.data); toast('Analysis complete', 'success'); }
+    else throw new Error();
+  } catch {
+    hideLoading();
+    localAnalysis(data);
+  }
+}
+
+// FIX #4 — Comprehensive local analysis (was minimal in original)
+function localAnalysis(d) {
+  const findings = [];
+  let penalty = 0;
+  if (d.systolic >= 180 || d.diastolic >= 120) {
+    penalty += 35;
+    findings.push({name:'Hypertensive Crisis',icon:'fa-tint',risk:Math.min(100,(d.systolic-120)*1.8),level:'high'});
+  } else if (d.systolic >= 140 || d.diastolic >= 90) {
+    penalty += 20;
+    findings.push({name:'Hypertension',icon:'fa-tint',risk:Math.min(100,(d.systolic-120)*1.5),level:'medium'});
+  }
+  if (d.glucose >= 200) {
+    penalty += 30;
+    findings.push({name:'Diabetes (Likely)',icon:'fa-candy-cane',risk:Math.min(100,(d.glucose-100)*.8),level:'high'});
+  } else if (d.glucose >= 126) {
+    penalty += 20;
+    findings.push({name:'Pre-Diabetes Risk',icon:'fa-candy-cane',risk:Math.min(100,(d.glucose-100)*.7),level:'medium'});
+  }
+  if (d.temperature >= 39) {
+    penalty += 20;
+    findings.push({name:'High Fever / Malaria Risk',icon:'fa-thermometer-half',risk:Math.min(100,(d.temperature-36)*20),level:'high'});
+  } else if (d.temperature >= 38) {
+    penalty += 10;
+    findings.push({name:'Fever',icon:'fa-thermometer-half',risk:Math.min(100,(d.temperature-36)*15),level:'medium'});
+  }
+  if (d.bmi >= 35) {
+    penalty += 15;
+    findings.push({name:'Obesity (Class II)',icon:'fa-weight-scale',risk:Math.min(100,(d.bmi-18.5)*3),level:'high'});
+  } else if (d.bmi >= 30) {
+    penalty += 10;
+    findings.push({name:'Obesity Risk',icon:'fa-weight-scale',risk:Math.min(100,(d.bmi-18.5)*2.5),level:'medium'});
+  }
+  displayResults({score:Math.max(0,Math.min(100,100-penalty)), findings});
+  toast('Offline mode — connect for full AI results', 'warning');
+}
+
+// FIX #5 — Score ring class correctly set (was never toggled in original)
+function displayResults(r) {
+  const ring = document.getElementById('healthScoreRing');
+  document.getElementById('healthScore').textContent = r.score;
+  ring.classList.remove('good','warning','danger');
+  let rc, label, note;
+  if (r.score >= 75) { rc='good';    label='Good Health';      note='Keep maintaining your healthy habits!'; }
+  else if (r.score >= 45) { rc='warning'; label='Monitor Closely'; note='Some risks detected. Consult a doctor.'; }
+  else { rc='danger';  label='Needs Attention';  note='Please visit a healthcare provider soon.'; }
+  ring.classList.add(rc);
+  document.getElementById('scoreLabel').textContent = label;
+  document.getElementById('scoreNote').textContent  = note;
+
+  document.getElementById('quickStats').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-2);">
+      <div style="display:flex;justify-content:space-between;"><span>BP</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${document.getElementById('sysInput').value}/${document.getElementById('diaInput').value} mmHg</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Blood Sugar</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${document.getElementById('gluInput').value} mg/dL</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>BMI</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${document.getElementById('bmiInput').value}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Temperature</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${document.getElementById('tempInput').value}°C</span></div>
+    </div>`;
+
+  if (!r.findings || !r.findings.length) {
+    document.getElementById('riskResults').innerHTML = '<div class="alert-info-soft"><i class="fas fa-check-circle me-2" style="color:var(--primary);"></i>No significant risks detected. Keep it up!</div>';
+    document.getElementById('chartWrap').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('riskResults').innerHTML = r.findings.map((f, i) => `
+    <div class="risk-item ${f.level||'low'}" style="animation-delay:${i*.1}s">
+      <div class="risk-header">
+        <div class="risk-name"><i class="fas ${f.icon||'fa-circle'} me-2"></i>${f.name}</div>
+        <div class="risk-pct" style="color:${f.level==='high'?'#ef4444':f.level==='medium'?'#f59e0b':'var(--primary)'}">${Math.round(f.risk)}%</div>
+      </div>
+      <div class="risk-bar"><div class="risk-bar-fill ${f.level||'low'}" data-w="${f.risk}"></div></div>
+      ${f.message?`<p style="font-size:12px;color:var(--text-2);margin-top:6px;margin-bottom:0;">${f.message}</p>`:''}
+    </div>`).join('');
+
+  // Animate bars after render (FIX: bars start at 0 and animate)
+  setTimeout(() => document.querySelectorAll('.risk-bar-fill[data-w]').forEach(el => { el.style.width = el.dataset.w + '%'; }), 60);
+
+  document.getElementById('chartWrap').style.display = 'block';
+  updateChart(r.findings);
+}
+
+function updateChart(findings) {
+  const canvas = document.getElementById('healthChart');
+  if (!canvas || !findings.length) return;
+  if (healthChart) healthChart.destroy();
+  healthChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: findings.map(f => f.name.length > 14 ? f.name.substring(0,13)+'…' : f.name),
+      datasets: [{
+        data: findings.map(f => Math.round(f.risk)),
+        backgroundColor: findings.map(f => f.level==='high'?'rgba(239,68,68,.8)':f.level==='medium'?'rgba(245,158,11,.8)':'rgba(14,184,127,.8)'),
+        borderRadius: 10, maxBarThickness: 55
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 100, ticks: { callback: v => v+'%', font: { family: 'DM Mono' } }, grid: { color: 'rgba(0,0,0,.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── BODY MAP ───────────────────────────────────────
+function setupBodyMap() {
+  document.querySelectorAll('.body-part').forEach(el => {
+    el.addEventListener('click', function() {
+      document.querySelectorAll('.body-part').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      showBodyPartSymptoms(this.dataset.part);
+    });
+  });
+}
+
+// FIX #6 — Symptom tags properly track selected state across body-part switches
+function showBodyPartSymptoms(part) {
+  const symptoms = SYMPTOM_MAP[part] || [];
+  document.getElementById('bodyPartSymptoms').innerHTML =
+    `<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${part.replace('_',' ')} symptoms</div>` +
+    symptoms.map(s => `
+      <div class="symptom-tag ${selectedSymptoms.includes(s)?'selected':''}" onclick="toggleSymptom('${s}',this)">
+        ${s.replace(/_/g,' ')}${selectedSymptoms.includes(s)?' <i class="fas fa-check" style="font-size:10px;"></i>':''}
+      </div>`).join('');
+}
+
+function toggleSymptom(s, el) {
+  const idx = selectedSymptoms.indexOf(s);
+  if (idx > -1) {
+    selectedSymptoms.splice(idx, 1);
+    el.classList.remove('selected');
+    el.innerHTML = s.replace(/_/g,' ');
+  } else {
+    selectedSymptoms.push(s);
+    el.classList.add('selected');
+    el.innerHTML = s.replace(/_/g,' ') + ' <i class="fas fa-check" style="font-size:10px;"></i>';
+  }
+  updateSelectedSymptomsList();
+}
+
+function updateSelectedSymptomsList() {
+  const el = document.getElementById('selectedSymptomsList');
+  if (!selectedSymptoms.length) {
+    el.innerHTML = '<span style="color:var(--text-3);font-size:12px;">None selected — tap the body map</span>';
+  } else {
+    el.innerHTML = selectedSymptoms.map(s =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--primary);color:white;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px;">
+         ${s.replace(/_/g,' ')}
+         <span onclick="removeSymptom('${s}')" style="cursor:pointer;opacity:.8;font-size:12px;">✕</span>
+       </span>`).join('');
+  }
+}
+
+function removeSymptom(s) {
+  selectedSymptoms = selectedSymptoms.filter(x => x !== s);
+  updateSelectedSymptomsList();
+  const active = document.querySelector('.body-part.active');
+  if (active) showBodyPartSymptoms(active.dataset.part);
+}
+
+async function analyzeSymptoms() {
+  if (!selectedSymptoms.length) return toast('Select at least one symptom from the body map', 'warning');
+  showLoading('Analyzing symptoms...');
+  try {
+    const res = await fetch(API_URL + '/symptoms/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptoms: selectedSymptoms, severity: +document.getElementById('severitySlider').value, duration: document.getElementById('symptomDuration').value })
+    });
+    if (!res.ok) throw new Error();
+    const json = await res.json(); hideLoading();
+    if (json.success && json.data?.findings) {
+      document.getElementById('symptomResults').innerHTML = json.data.findings.map(f => `
+        <div class="risk-item ${f.urgency==='urgent'?'high':'medium'} mt-2">
+          <div class="risk-header"><div class="risk-name"><i class="fas ${f.icon||'fa-stethoscope'} me-2"></i>${f.disease}</div><div class="risk-pct">${f.confidence}%</div></div>
+          <div class="risk-bar"><div class="risk-bar-fill ${f.urgency==='urgent'?'high':'medium'}" style="width:${f.confidence}%"></div></div>
+          <p style="font-size:12px;margin-top:6px;margin-bottom:4px;">${f.message||''}</p>
+          <div style="font-size:12px;color:var(--primary-dk);font-weight:600;">✅ ${f.action||'Consult a healthcare provider'}</div>
+        </div>`).join('');
+    }
+  } catch {
+    hideLoading();
+    document.getElementById('symptomResults').innerHTML = `<div class="alert-warning-soft">⚠️ Server unavailable. Based on your symptoms (severity ${document.getElementById('severitySlider').value}/10), please consult a healthcare provider or call <strong>907</strong> if this is an emergency.</div>`;
+  }
+}
+
+// ── HERBS ──────────────────────────────────────────
+async function loadHerbs() {
+  try {
+    const res = await fetch(API_URL + '/herbs');
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+    allHerbs = (json.success && json.data?.length) ? json.data : HERBS_FALLBACK;
+  } catch { allHerbs = HERBS_FALLBACK; }
+  renderHerbs(allHerbs);
+}
+
+function renderHerbs(herbs) {
+  document.getElementById('herbList').innerHTML = herbs.map(h => `
+    <div class="herb-card" onclick="showHerbDetail('${h.id}')">
+      <div class="herb-icon">${h.emoji||'🌿'}</div>
+      <div class="herb-name">${h.name}</div>
+      <div class="herb-sci">${h.scientific}</div>
+      <div class="herb-uses">${h.uses}</div>
+    </div>`).join('');
+}
+
+function filterHerbs() {
+  const q = document.getElementById('herbSearch').value.toLowerCase().trim();
+  renderHerbs(q ? allHerbs.filter(h => h.name.toLowerCase().includes(q) || h.uses.toLowerCase().includes(q) || h.scientific.toLowerCase().includes(q)) : allHerbs);
+}
+
+// FIX — Herb detail uses correct CSS (was "text-purple" which is not a CSS class)
+function showHerbDetail(id) {
+  const h = allHerbs.find(x => x.id === id);
+  if (!h) return;
+  document.getElementById('herbDetail').innerHTML = `
+    <div class="herb-detail-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:36px;margin-bottom:8px;">${h.emoji||'🌿'}</div>
+          <h5 style="font-weight:800;color:var(--text-1);">${h.name}</h5>
+          <p style="font-size:12px;font-style:italic;color:var(--text-3);">${h.scientific}</p>
+        </div>
+        <button onclick="document.getElementById('herbDetail').innerHTML=''" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:inherit;">✕ Close</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-2);margin-top:10px;line-height:1.6;">${h.uses}</p>
+      ${h.warnings?.length ? `<div class="alert-danger-soft mt-3"><strong>⚠️ Warnings</strong><br>${h.warnings.map(w=>'• '+w).join('<br>')}</div>` : ''}
+    </div>`;
+}
+
+// ── FDA DRUG SEARCH ────────────────────────────────
+async function searchFDA() {
+  const q = document.getElementById('drugSearchInput').value.trim();
+  if (!q) return toast('Please enter a drug name', 'warning');
+  document.getElementById('drugResults').innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner" style="width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;font-size:13px;color:var(--text-3);">Searching FDA database...</p></div>';
+  try {
+    const res = await fetch(`${API_URL}/fda/drugs?name=${encodeURIComponent(q)}`);
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+    const drugs = json.data?.drugs;
+    if (drugs && drugs.length) {
+      document.getElementById('drugResults').innerHTML = drugs.map((d,i) => `
+        <div class="drug-card" style="animation-delay:${i*.08}s">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div class="drug-brand">${d.brandName||d.name||'Unknown'}</div>
+            <span style="background:var(--primary-lt);color:var(--primary-dk);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">${d.source||'FDA'}</span>
+          </div>
+          <div class="drug-generic">${d.genericName||''}</div>
+          ${d.indications?`<div class="drug-text">${d.indications.substring(0,250)}${d.indications.length>250?'…':''}</div>`:''}
+          ${d.warnings?`<div class="alert-danger-soft mt-2">⚠️ ${d.warnings.substring(0,200)}${d.warnings.length>200?'…':''}</div>`:''}
+        </div>`).join('');
+    } else {
+      document.getElementById('drugResults').innerHTML = `<div class="empty-state"><i class="fas fa-search-minus d-block"></i><p>No results for "<strong>${q}</strong>". Try a different name.</p></div>`;
+    }
+  } catch {
+    document.getElementById('drugResults').innerHTML = '<div class="alert-warning-soft">⚠️ Could not reach FDA database. Check your connection and try again.</div>';
+  }
+}
+
+function quickFDA(name) { document.getElementById('drugSearchInput').value = name; searchFDA(); }
+
+// ── INTERACTIONS (FIX #8 — real logic, not just static text) ──
+async function checkInteraction() {
+  const d1 = document.getElementById('interDrug1').value.trim().toLowerCase();
+  const d2 = document.getElementById('interDrug2').value.trim().toLowerCase();
+  if (!d1 || !d2) return toast('Enter both drug names to check', 'warning');
+  showLoading('Checking interaction database...');
+  await new Promise(r => setTimeout(r, 600));
+  try {
+    const res = await fetch(`${API_URL}/interactions/check`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drug1: d1, drug2: d2 })
+    });
+    if (!res.ok) throw new Error();
+    const json = await res.json(); hideLoading();
+    renderInterResult(json.data || json, d1, d2);
+  } catch {
+    hideLoading();
+    const match = KNOWN_INTERACTIONS.find(i => i.drugs.some(d => d1.includes(d)||d.includes(d1)) && i.drugs.some(d => d2.includes(d)||d.includes(d2)));
+    if (match) renderInterResult(match, d1, d2);
+    else {
+      document.getElementById('interResults').innerHTML = `
+        <div class="alert-info-soft">
+          <strong>💊 ${capitalize(d1)} + ${capitalize(d2)}</strong><br>
+          No specific interaction found in our local database. This does not mean no interaction exists.<br>
+          <strong>Always</strong> consult your doctor or pharmacist before combining medications.<br>
+          <em style="font-size:11px;color:var(--text-3);">Free consultation: visit any Ethiopian government health center.</em>
+        </div>`;
+    }
+  }
+}
+
+function renderInterResult(data, d1, d2) {
+  const sev = data.severity;
+  const bg     = sev==='high'?'#fef2f2':sev==='medium'?'#fffbeb':'var(--primary-lt)';
+  const border = sev==='high'?'#fecaca':sev==='medium'?'#fde68a':'rgba(14,184,127,.2)';
+  const icon   = sev==='high'?'🚨':sev==='medium'?'⚠️':'✅';
+  const label  = sev==='high'?'High Risk':sev==='medium'?'Moderate Risk':'Low / No Risk';
+  document.getElementById('interResults').innerHTML = `
+    <div style="background:${bg};border:1.5px solid ${border};border-radius:14px;padding:18px;animation:slide-in-right .4s var(--ease);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <strong style="font-size:15px;">${icon} ${capitalize(d1)} + ${capitalize(d2)}</strong>
+        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${border};color:var(--text-1);">${label}</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-2);line-height:1.6;">${data.msg||data.message||''}</p>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-3);">⚕️ Always consult your doctor or pharmacist before combining medications.</div>
+    </div>`;
+}
+
+// ── AI CHAT (FIX #9 — robust response extraction) ──
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const box = document.getElementById('chatBox');
+  box.innerHTML += `<div class="msg msg-user">${msg}</div>`;
+  input.value = '';
+  box.scrollTop = box.scrollHeight;
+  const typingId = 'typing-' + Date.now();
+  box.innerHTML += `<div class="msg msg-bot" id="${typingId}"><strong>🤖 Grok:</strong> <span style="opacity:.45;font-style:italic;">typing...</span></div>`;
+  box.scrollTop = box.scrollHeight;
+  try {
+    const res = await fetch(API_URL + '/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, language: 'en' })
+    });
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+    // FIX: handle all possible response shapes
+    const reply = json.data?.response?.en || json.data?.response || json.response?.en || json.response || json.message || 'I understand. Please consult a healthcare provider for personalized advice.';
+    document.getElementById(typingId).innerHTML = `<strong>🤖 Grok:</strong> ${reply}`;
+  } catch {
+    document.getElementById(typingId).innerHTML = `<strong>🤖 Grok:</strong> I'm currently offline. For medical emergencies please call <strong>907</strong> immediately.`;
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
+Do
