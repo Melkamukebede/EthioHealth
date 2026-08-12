@@ -665,15 +665,227 @@ function setupBodyMap() {
   });
 }
 
-// FIX #6 — Symptom tags properly track selected state across body-part switches
-function showBodyPartSymptoms(part) {
-  const symptoms = SYMPTOM_MAP[part] || [];
-  document.getElementById('bodyPartSymptoms').innerHTML =
-    `<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${part.replace('_',' ')} symptoms</div>` +
-    symptoms.map(s => `
-      <div class="symptom-tag ${selectedSymptoms.includes(s)?'selected':''}" onclick="toggleSymptom('${s}',this)">
-        ${s.replace(/_/g,' ')}${selectedSymptoms.includes(s)?' <i class="fas fa-check" style="font-size:10px;"></i>':''}
-      </div>`).join('');
+// ============================================
+// 3D INTERACTIVE HUMAN BODY MAP
+// ============================================
+let body3D = { scene: null, camera: null, renderer: null, parts: [], selectedPart: 'head' };
+
+function setupBodyMap() {
+    const container = document.getElementById('body3DCanvas');
+    if (!container) return;
+
+    const W = container.clientWidth || 280;
+    const H = container.clientHeight || 420;
+
+    // Scene
+    body3D.scene = new THREE.Scene();
+    body3D.scene.background = new THREE.Color(0xf7fafa);
+
+    // Camera
+    body3D.camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+    body3D.camera.position.set(0, 0.5, 5);
+    body3D.camera.lookAt(0, 0, 0);
+
+    // Renderer
+    body3D.renderer = new THREE.WebGLRenderer({ antialias: true });
+    body3D.renderer.setSize(W, H);
+    body3D.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(body3D.renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    body3D.scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    directionalLight.position.set(2, 3, 4);
+    body3D.scene.add(directionalLight);
+
+    // Ground reference
+    const gridHelper = new THREE.PolarGridHelper(2, 16, 8, 64, 0x10b981, 0x10b981);
+    gridHelper.position.y = -2.2;
+    body3D.scene.add(gridHelper);
+
+    // Create body parts
+    createBodyParts();
+
+    // Mouse interaction
+    setupMouseInteraction(container);
+
+    // Render loop
+    function animate() {
+        requestAnimationFrame(animate);
+        if (body3D.renderer && body3D.scene && body3D.camera) {
+            body3D.renderer.render(body3D.scene, body3D.camera);
+        }
+    }
+    animate();
+
+    // Show head symptoms by default
+    showBodyPartSymptoms('head');
+}
+
+function createBodyParts() {
+    const materialDefault = new THREE.MeshPhongMaterial({ color: 0xe5e7eb, emissive: 0x000000, shininess: 30, transparent: true, opacity: 0.85 });
+    const materialHover = new THREE.MeshPhongMaterial({ color: 0x10b981, emissive: 0x000000, shininess: 60, transparent: true, opacity: 0.7 });
+
+    function createPart(geometry, position, name) {
+        const mesh = new THREE.Mesh(geometry, materialDefault.clone());
+        mesh.position.set(position[0], position[1], position[2]);
+        mesh.userData = { name: name, defaultMaterial: mesh.material, hoverMaterial: materialHover.clone(), isBodyPart: true };
+        body3D.scene.add(mesh);
+        body3D.parts.push(mesh);
+        return mesh;
+    }
+
+    // Head
+    const headGeo = new THREE.SphereGeometry(0.55, 32, 32);
+    headGeo.scale(1, 1.1, 0.9);
+    const head = createPart(headGeo, [0, 1.5, 0], 'head');
+
+    // Neck
+    const neckGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.3, 16);
+    createPart(neckGeo, [0, 0.85, 0], 'neck');
+
+    // Chest / Torso
+    const torsoGeo = new THREE.CylinderGeometry(0.55, 0.5, 1.1, 16);
+    torsoGeo.scale(1, 1, 0.7);
+    createPart(torsoGeo, [0, 0.2, 0], 'chest');
+
+    // Abdomen
+    const abdomenGeo = new THREE.CylinderGeometry(0.48, 0.5, 0.8, 16);
+    createPart(abdomenGeo, [0, -0.65, 0], 'abdomen');
+
+    // Left Upper Arm
+    const leftUpperArmGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.7, 16);
+    leftUpperArmGeo.rotateZ(Math.PI / 6);
+    createPart(leftUpperArmGeo, [-0.7, 0.5, 0], 'left_arm');
+
+    // Left Forearm
+    const leftForearmGeo = new THREE.CylinderGeometry(0.1, 0.12, 0.6, 16);
+    leftForearmGeo.rotateZ(Math.PI / 6);
+    createPart(leftForearmGeo, [-0.9, -0.15, 0], 'left_arm');
+
+    // Right Upper Arm
+    const rightUpperArmGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.7, 16);
+    rightUpperArmGeo.rotateZ(-Math.PI / 6);
+    createPart(rightUpperArmGeo, [0.7, 0.5, 0], 'right_arm');
+
+    // Right Forearm
+    const rightForearmGeo = new THREE.CylinderGeometry(0.1, 0.12, 0.6, 16);
+    rightForearmGeo.rotateZ(-Math.PI / 6);
+    createPart(rightForearmGeo, [0.9, -0.15, 0], 'right_arm');
+
+    // Left Thigh
+    const leftThighGeo = new THREE.CylinderGeometry(0.18, 0.2, 0.8, 16);
+    createPart(leftThighGeo, [-0.25, -1.35, 0], 'left_leg');
+
+    // Left Calf
+    const leftCalfGeo = new THREE.CylinderGeometry(0.14, 0.18, 0.7, 16);
+    createPart(leftCalfGeo, [-0.25, -2.1, 0], 'left_leg');
+
+    // Right Thigh
+    const rightThighGeo = new THREE.CylinderGeometry(0.18, 0.2, 0.8, 16);
+    createPart(rightThighGeo, [0.25, -1.35, 0], 'right_leg');
+
+    // Right Calf
+    const rightCalfGeo = new THREE.CylinderGeometry(0.14, 0.18, 0.7, 16);
+    createPart(rightCalfGeo, [0.25, -2.1, 0], 'right_leg');
+}
+
+function setupMouseInteraction(container) {
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let isDragging = false, previousMouse = { x: 0, y: 0 };
+
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const dx = e.clientX - previousMouse.x;
+            const dy = e.clientY - previousMouse.y;
+            body3D.parts.forEach(p => { p.rotation.y += dx * 0.01; p.rotation.x += dy * 0.01; });
+            previousMouse = { x: e.clientX, y: e.clientY };
+            return;
+        }
+
+        // Hover effect
+        const rect = container.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, body3D.camera);
+        const intersects = raycaster.intersectObjects(body3D.parts);
+
+        body3D.parts.forEach(p => {
+            if (p.userData.isBodyPart) {
+                p.material = p.userData.defaultMaterial;
+                p.material.emissive?.setHex(0x000000);
+            }
+        });
+
+        if (intersects.length > 0) {
+            const obj = intersects[0].object;
+            if (obj.userData.isBodyPart) {
+                obj.material = obj.userData.hoverMaterial;
+                container.style.cursor = 'pointer';
+            }
+        } else {
+            container.style.cursor = 'grab';
+        }
+    });
+
+    container.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        const dx = Math.abs(e.clientX - previousMouse.x);
+        const dy = Math.abs(e.clientY - previousMouse.y);
+        isDragging = false;
+
+        // If barely moved, treat as click
+        if (dx < 3 && dy < 3) {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, body3D.camera);
+            const intersects = raycaster.intersectObjects(body3D.parts);
+            if (intersects.length > 0) {
+                const partName = intersects[0].object.userData.name;
+                body3D.selectedPart = partName;
+                body3D.parts.forEach(p => { p.material = p.userData.defaultMaterial; });
+                intersects[0].object.material = new THREE.MeshPhongMaterial({ color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.3, shininess: 80 });
+                showBodyPartSymptoms(partName);
+                pulseAnimation(intersects[0].object);
+            }
+        }
+    });
+
+    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = 'grab'; });
+
+    // Touch support
+    container.addEventListener('touchstart', (e) => { e.preventDefault(); isDragging = true; previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+    container.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (isDragging) {
+            const dx = e.touches[0].clientX - previousMouse.x;
+            const dy = e.touches[0].clientY - previousMouse.y;
+            body3D.parts.forEach(p => { p.rotation.y += dx * 0.01; p.rotation.x += dy * 0.01; });
+            previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+    });
+    container.addEventListener('touchend', () => { isDragging = false; });
+}
+
+function pulseAnimation(mesh) {
+    const originalScale = mesh.scale.clone();
+    const startTime = Date.now();
+    function pulse() {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > 400) { mesh.scale.copy(originalScale); return; }
+        const s = 1 + Math.sin(elapsed * 0.02) * 0.08;
+        mesh.scale.set(s, s, s);
+        requestAnimationFrame(pulse);
+    }
+    pulse();
 }
 
 function toggleSymptom(s, el) {
